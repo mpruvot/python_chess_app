@@ -1,9 +1,13 @@
 from .player import Player
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, List
+from typing_extensions import Annotated
 import uuid
 
 class Game(BaseModel):
-    uuid : uuid.UUID = Field(default_factory=uuid.uuid4)
+    game_uuid : uuid.UUID = Field(default_factory=uuid.uuid4)
     players : List[Player] = []
     # State -> probably need to load it from a database
+    
+    
+# https://docs.pydantic.dev/latest/concepts/validators/

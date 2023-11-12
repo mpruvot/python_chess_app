@@ -3,6 +3,7 @@ import chess
 # Ascii representaiton of the chess board
 board = chess.Board()
 
+print(board)
 
 
 # board.push_san('e4') -> makes a move

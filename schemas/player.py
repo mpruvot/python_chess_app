@@ -1,10 +1,14 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
 import uuid
+from typing import Optional, List
+from pydantic import BaseModel, Field
+from game import Game
+
 
 class Player(BaseModel):
+    '''Player model'''
     name : str
-    uuid : uuid.UUID = Field(default_factory=uuid.uuid4)
+    player_uuid : uuid.UUID = Field(default_factory=uuid.uuid4)
     rank : int
     friends : List['Player'] = []
+    active_games : List[Game] = []
     
