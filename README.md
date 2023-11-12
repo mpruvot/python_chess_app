@@ -20,7 +20,7 @@
   - Leaving a game.
 
 #### 3. Integration with the Chess API
-- Utilizing the Chess API for managing moves and game rules.
+- Utilizing the Python Chess Library for managing moves and game rules.
 - Developing a script to initiate a chess game based on the current game state.
 
 #### 4. Database Management
