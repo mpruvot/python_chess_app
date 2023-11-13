@@ -3,3 +3,6 @@ class GameNotFoundError(Exception):
 
 class NotActiveGameError(Exception):
     pass
+
+class GameIsFullError(Exception):
+    pass
