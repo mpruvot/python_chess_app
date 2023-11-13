@@ -1,4 +1,4 @@
-from .player import Player
+from .player_schema import Player
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 from typing_extensions import Annotated

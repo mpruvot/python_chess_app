@@ -1,6 +1,6 @@
 import fastapi
 import uuid
-from schemas.game import game
+from schemas.game_schema import Game
 from services.game_services import *
 
 router = fastapi.APIRouter()

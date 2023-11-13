@@ -1,5 +1,5 @@
-from schemas.game import Game
-from schemas.player import Player
+from schemas.game_schema import Game
+from schemas.player_schema import Player
 import uuid
 
 players_list = []

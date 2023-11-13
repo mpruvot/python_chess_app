@@ -1,5 +1,5 @@
 import fastapi
-from schemas.player import Player
+from schemas.player_schema import Player
 from services.player_services import *
 
 router = fastapi.APIRouter()

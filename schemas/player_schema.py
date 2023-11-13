@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional, List
 from pydantic import BaseModel, Field
-from game import Game
+from schemas.game_schema import Game
 
 
 class Player(BaseModel):
