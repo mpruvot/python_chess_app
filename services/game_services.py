@@ -1,5 +1,4 @@
-from schemas.game_schema import Game
-from schemas.player_schema import Player
+from schemas.chess_schemas import Game, Player
 from custom_errors.custom_errors import *
 import uuid
 
