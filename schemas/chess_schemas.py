@@ -18,7 +18,7 @@ class Game(BaseModel):
             
     
     # State -> probably need to load it from a database
-     
+    
 class Player(BaseModel):
     '''Player model'''
     name : str

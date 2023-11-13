@@ -14,8 +14,11 @@ def create_player(name: str) -> Player:
     players_list.append(player)
     return player
 
-def get_all_players() -> List[Player]:
+def get_all_players() -> Optional[List[Player]]:
+    if not players_list:
+        raise PlayernotFoundError('List is empty !')
     return players_list
+     
 
 def get_player_by_name(name: str) -> Optional[Player]:
     player = [player for player in players_list if player.name == name]
