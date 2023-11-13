@@ -6,3 +6,9 @@ class NotActiveGameError(Exception):
 
 class GameIsFullError(Exception):
     pass
+
+class PlayernotFoundError(Exception):
+    pass
+
+class NameAlreadyExistsError(Exception):
+    pass
