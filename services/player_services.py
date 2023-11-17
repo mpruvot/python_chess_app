@@ -17,3 +17,12 @@ def get_all_players() -> Optional[List[Player]]:
 
     players = [Player(**player_data['attributes']) for player_data in data]
     return players
+
+def get_single_player(name: str) -> Player:
+    data = get_all_players()
+    single_player = [player for player in data if player.name.lower() == name.lower()]
+    
+    if single_player:
+        return single_player[0]
+    else:
+        raise PlayernotFoundError('No player found under this name')
