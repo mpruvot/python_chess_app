@@ -1,28 +1,19 @@
 from schemas.chess_schemas import Game, Player
 import uuid
 from typing import List, Optional
+from database_services import strapi_services
 from custom_errors.custom_errors import *
 
-players_list = []
-
 def create_player(name: str) -> Player:
-    """Create a new PLayer"""
-    for player in players_list:
-        if player.name == name:
-            raise NameAlreadyExistsError('user already exists, please choose another name')
+    """Create a new Player and store it into strapi_db"""
     player = Player(name=name)
-    players_list.append(player)
+    strapi_services.store_player_in_db(player)
+    
     return player
 
 def get_all_players() -> Optional[List[Player]]:
-    if not players_list:
+    players = strapi_services.get_players_from_db()
+    if not players:
         raise PlayernotFoundError('List is empty !')
-    return players_list
+    return players
      
-
-def get_player_by_name(name: str) -> Optional[Player]:
-    player = [player for player in players_list if player.name == name]
-    if player:
-        return player[0]
-    else:
-        raise PlayernotFoundError('No player found under this Name')

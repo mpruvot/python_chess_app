@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "games",
+  "info": {
+    "singularName": "game",
+    "pluralName": "games",
+    "displayName": "Game",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "is_active": {
+      "type": "boolean",
+      "required": false,
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "game_uuid": {
+      "type": "uid",
+      "required": true
+    },
+    "players": {
+      "type": "json",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    }
+  }
+}
