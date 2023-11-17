@@ -8,12 +8,12 @@ def create_player(name: str) -> Player:
     """Create a new Player and store it into strapi_db"""
     player = Player(name=name)
     strapi_services.store_player_in_db(player)
-    
     return player
 
 def get_all_players() -> Optional[List[Player]]:
-    players = strapi_services.get_players_from_db()
-    if not players:
+    data = strapi_services.get_players_from_db().get('data')
+    if not data:
         raise PlayernotFoundError('List is empty !')
+
+    players = [Player(**player_data['attributes']) for player_data in data]
     return players
-     
