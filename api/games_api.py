@@ -11,8 +11,13 @@ def new_game():
     """Create a New Game"""
     return create_game()
 
-@router.post('/join/{game}')
-#To be defined
+@router.put('/join/{game_uuid}/{player_name}')
+def join_game(game_uuid: str, player_name: str):
+    try: 
+        add_player_in_game(game_uuid, player_name)
+    except GameIsFullError as err:
+        raise HTTPException(status_code=403, detail=str(err))
+            
 
 @router.get('/games')
 def get_all_games():
@@ -23,7 +28,7 @@ def get_all_games():
         raise HTTPException(status_code=404, detail=str(err))
 
 @router.get('/game/{game_uuid}')
-def get_single_game(game_uuid: uuid.UUID):
+def get_single_game(game_uuid: str):
     """Retrieve a game by its UUID"""
     try:
         return retrieve_single_game(game_uuid)

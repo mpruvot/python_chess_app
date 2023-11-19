@@ -18,18 +18,28 @@ def retrieve_all_games() -> Optional[List[Game]]:
     games = [Game(**game_data['attributes']) for game_data in data]
     return games
 
-def retrieve_single_game(game_uuid: uuid.UUID) -> Game:
+def retrieve_single_game(game_uuid: str) -> Game:
     """Retrieve a game by its UUID"""
     games_data = retrieve_all_games()
-    single_game = [game for game in games_data if game.game_uuid == game_uuid]
+    single_game = [game for game in games_data if str(game.game_uuid) == game_uuid]
     
     if single_game:
         return single_game[0]
     else:
-        raise GameNotFoundError('No game found under this name')
+        raise GameNotFoundError('No game found under this uuid')
 
     
     
-""" def join_game(game: Game, game: game) -> None:
-    '''Allows a game to join an active game which is not already full'''
-     """
+def add_player_in_game(game_uuid: str, player_name: str) -> Game:
+    '''Allows a Player to join an active game which is not already full'''
+    game = retrieve_single_game(game_uuid)
+    
+    if player_name in game.players:
+        raise GameIsFullError
+    if len(game.players) == 2:
+        raise GameIsFullError
+    
+    game.players.append(player_name)
+    return Game
+        
+    
