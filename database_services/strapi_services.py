@@ -5,14 +5,16 @@
 
 import requests
 import json
-from schemas.chess_schemas import Player
+from schemas.chess_schemas import Player, Game
 from pydantic import json_schema, BaseModel
 from custom_errors.custom_errors import *
 
 API_URL = "http://localhost:1337/api"
 
 
-def get_players_from_db():
+##### PLAYER DATABASE SERVICES #####
+
+def get_players_from_db() -> json:
     """return a list of all the players stored in databse
 
     Returns:
@@ -27,7 +29,7 @@ def get_players_from_db():
         raise PlayernotFoundError("list of plaers is empty !")
     
     
-def store_player_in_db(new_player: Player):
+def store_player_in_db(new_player: Player) -> json:
     """Store an instance of player objet in database
 
     Args:
@@ -55,4 +57,41 @@ def store_player_in_db(new_player: Player):
             raise err
 
 
+##### GAME DATABASE SERVICES #####
 
+def store_game_in_db(new_game : Game) -> json:
+    """Store an instance of Game objet in database
+
+    Args:
+        new_game (Game): Instance of Game created by a post.request 
+
+    Returns:
+        _type_: json
+    """
+    game_data = new_game.model_dump()
+    game_data["game_uuid"] = str(game_data["game_uuid"])
+    try:
+        r = requests.post(
+            "http://localhost:1337/api/games",
+            headers={"Content-Type": "application/json"},
+            data=json.dumps({"data": game_data}),
+        )
+        r.raise_for_status()
+        return r.json()
+    except requests.exceptions.HTTPError as err:
+        raise err
+    
+def get_games_from_db() -> json:
+    """return a list of all the games stored in database
+
+    Returns:
+        _type_: Json
+    """
+    try:
+        r = requests.get(API_URL + "/games")
+        r.raise_for_status()
+        response = r.json()
+        return response
+    except requests.exceptions.HTTPError as err:
+        raise GameNotFoundError("list of games is empty !")
+        

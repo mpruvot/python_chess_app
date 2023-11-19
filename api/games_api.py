@@ -14,10 +14,11 @@ def new_game():
 @router.post('/join/{game}')
 #To be defined
 
-@router.get('/games/{uuid}')
-def get_game(uuid : uuid.UUID):
-    """Return a specific game when you provide its UUID"""
-    try: 
-        return retrieve_game(uuid)
+@router.get('/games')
+def get_all_games():
+    """Return a list of all the games"""
+    try:
+        return retrieve_all_games()
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
+    

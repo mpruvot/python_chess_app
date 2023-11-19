@@ -1,5 +1,7 @@
 from schemas.chess_schemas import Game, Player
 from custom_errors.custom_errors import *
+from database_services import strapi_services
+from typing import Optional, List
 import uuid
 
 
@@ -10,8 +12,17 @@ games_list = []
 def create_game() -> Game:
     """Create a new Game"""
     game = Game()
-    games_list.append(game)
+    strapi_services.store_game_in_db(game)
     return game
+
+def retrieve_all_games() -> Optional[List[Game]]:
+    """retrieve a List of all the games"""
+    data = strapi_services.get_games_from_db().get('data')
+    if not data:
+        raise GameNotFoundError('List is empty !')
+    games = [Game(**game_data['attributes']) for game_data in data]
+    return games
+
 
 def join_game(game: Game, player: Player) -> None:
     '''Allows a player to join an active game which is not already full'''
@@ -23,14 +34,6 @@ def join_game(game: Game, player: Player) -> None:
     elif len(game.players) == 2:
         raise GameIsFullError('Already to players in the Game, please choose another Game, or create one')
     
-    
     game.players.append(player)
     player.active_games.append(game)
     
-def retrieve_game(game_uuid: uuid.UUID) -> Game:
-    """Retrieve a game by its Uuid"""
-    found_game = [game for game in games_list if game.game_uuid == game_uuid]
-    if found_game:
-        return found_game[0]
-    else: 
-        raise GameNotFoundError('No game found uder this ID, please provide a valid ID')

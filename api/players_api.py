@@ -26,10 +26,7 @@ def get_players() -> List[Player]:
 @router.get('/player/{name}')
 def return_player_by_name(name: str) -> Player:
     try:
-        players = get_all_players()
-        found_player = [player for player in players.get('data') if player['attributes'].get('name') == name]
-        if found_player:
-            return found_player
-        raise PlayernotFoundError
+        player_found = get_single_player(name)
+        return player_found
     except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
