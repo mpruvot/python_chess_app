@@ -21,4 +21,12 @@ def get_all_games():
         return retrieve_all_games()
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
+
+@router.get('/game/{game_uuid}')
+def get_single_game(game_uuid: uuid.UUID):
+    """Retrieve a game by its UUID"""
+    try:
+        return retrieve_single_game(game_uuid)
+    except GameNotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
     

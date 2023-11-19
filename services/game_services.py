@@ -4,11 +4,6 @@ from database_services import strapi_services
 from typing import Optional, List
 import uuid
 
-
-#Just for test before implementing a database
-games_list = []
-
-
 def create_game() -> Game:
     """Create a new Game"""
     game = Game()
@@ -23,17 +18,18 @@ def retrieve_all_games() -> Optional[List[Game]]:
     games = [Game(**game_data['attributes']) for game_data in data]
     return games
 
+def retrieve_single_game(game_uuid: uuid.UUID) -> Game:
+    """Retrieve a game by its UUID"""
+    games_data = retrieve_all_games()
+    single_game = [game for game in games_data if game.game_uuid == game_uuid]
+    
+    if single_game:
+        return single_game[0]
+    else:
+        raise GameNotFoundError('No game found under this name')
 
-def join_game(game: Game, player: Player) -> None:
-    '''Allows a player to join an active game which is not already full'''
     
-    if game not in games_list:
-        raise GameNotFoundError('The game you are tyrying to join does not exists')
-    elif not game.is_active:
-        raise NotActiveGameError('Game is not active, or finished')
-    elif len(game.players) == 2:
-        raise GameIsFullError('Already to players in the Game, please choose another Game, or create one')
     
-    game.players.append(player)
-    player.active_games.append(game)
-    
+""" def join_game(game: Game, game: game) -> None:
+    '''Allows a game to join an active game which is not already full'''
+     """
