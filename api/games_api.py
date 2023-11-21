@@ -11,7 +11,7 @@ def new_game():
     """Create a New Game"""
     return create_game()
 
-@router.put('/join/{game_uuid}/{player_name}')
+@router.patch('/join/{game_uuid}/{player_name}')
 def join_game(game_uuid: str, player_name: str):
     try: 
         add_player_in_game(game_uuid, player_name)

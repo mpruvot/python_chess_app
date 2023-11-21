@@ -9,7 +9,7 @@ from schemas.chess_schemas import Player, Game
 from pydantic import json_schema, BaseModel
 from custom_errors.custom_errors import *
 
-API_URL = "http://localhost:1337/api"
+API_URL = "http://localhost:1337/api/"
 
 
 ##### PLAYER DATABASE SERVICES #####
@@ -94,4 +94,27 @@ def get_games_from_db() -> json:
         return response
     except requests.exceptions.HTTPError as err:
         raise GameNotFoundError("list of games is empty !")
-        
+    
+def get_single_game(game_uuid: str):
+    url = f"{API_URL}games?filters[game_uuid][$eq]={game_uuid}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        games = response.json()
+        if not games['data']:
+            raise GameNotFoundError
+        return games['data'][0]  
+    except requests.exceptions.HTTPError as err:
+        raise GameNotFoundError("list of games is empty !")
+
+def get_strapi_game_id(game_uuid: str):
+    """retrieve the strapi ID of a Game"""
+    try:
+        data = get_single_game(game_uuid)
+        return data.get('id')
+    except requests.exceptions.HTTPError as err:
+        raise GameNotFoundError
+    
+def put_add_player(player: str, game_uuid: str):
+    """Update an existing game: add a new Player in List[Player]"""
+    pass
