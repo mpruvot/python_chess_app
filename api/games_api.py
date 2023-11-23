@@ -4,7 +4,7 @@ from services.game_services import *
 
 router = APIRouter()
 
-@router.post('/games', response_model=Game)
+@router.post('/game', response_model=Game)
 def new_game():
     """Create a New Game"""
     return create_game()

@@ -6,7 +6,7 @@ from typing import List
 
 router = APIRouter()
 
-@router.post('/players/', response_model=Player)
+@router.post('/player/', response_model=Player)
 def new_player(name: str) -> Player:
     """Create a new Player"""
     try:
