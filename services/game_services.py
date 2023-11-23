@@ -8,33 +8,26 @@ api_service = StrapiApiService()
 def create_game() -> Game:
     """Create a new Game"""
     game = Game()
-    api_service.store_game_in_db(game)
-    return game
+    return api_service.store_game_in_db(game)
 
 def retrieve_all_games() -> Optional[List[Game]]:
     """Retrieve a list of all the games"""
-    data = api_service.get_games_from_db().get('data')
-    if not data:
+    try:
+        return api_service.get_games_from_db()
+    except GameNotFoundError:
         raise GameNotFoundError('List is empty!')
-    return [Game(**game_data['attributes']) for game_data in data]
 
 def retrieve_single_game(game_uuid: str) -> Game:
     """Retrieve a game by its UUID"""
     try:
-        game_data = api_service.get_single_game(game_uuid)
-        return Game(**game_data['attributes'])
+        return api_service.get_single_game(game_uuid)
     except GameNotFoundError:
         raise GameNotFoundError(f'No game found with UUID: {game_uuid}')
 
-def add_player_in_game(game_uuid: str, player_name: str) -> Game:
+def add_player_in_game(game: Game, player: Player) -> Game:
     """Allows a Player to join an active game which is not already full"""
-    game = retrieve_single_game(game_uuid)
+    if player in game.players:
+        raise PlayerAlreadyInGameError(f'Player {player.name} is already in the game.')
     
-    if player_name in game.players:
-        raise PlayerAlreadyInGameError(f'Player {player_name} is already in the game.')
-    if len(game.players) >= 2:
-        raise GameIsFullError('The game is already full.')
-
-    game.players.append(player_name)
-    # update database?
-    return game
+    updated_game = api_service.update_game_with_new_player(player, game)
+    return updated_game
