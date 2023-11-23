@@ -2,6 +2,7 @@ import requests
 import json
 from schemas.chess_schemas import Player, Game
 from custom_errors.custom_errors import *
+from typing import List
 
 class StrapiApiService:
     API_URL = "http://localhost:1337/api"
@@ -9,59 +10,58 @@ class StrapiApiService:
     def __init__(self) -> None:
         pass
 
-    def get_players_from_db(self) -> json:
+    def get_players_from_db(self) -> List[Player]:
         """Return a list of all the players stored in database."""
         try:
             r = requests.get(f"{self.API_URL}/players")
             r.raise_for_status()
-            return r.json()
+            players_data = r.json()['data']
+            return [Player(**player['attributes']) for player in players_data]
         except requests.exceptions.HTTPError:
             raise PlayernotFoundError
 
-    def store_player_in_db(self, new_player: Player) -> json:
+    def store_player_in_db(self, new_player: Player) -> Player:
         """Store an instance of player object in database."""
-        player_data = new_player.model_dump()
-        player_data["player_uuid"] = str(player_data["player_uuid"])
         try:
             r = requests.post(
                 f"{self.API_URL}/players",
                 headers={"Content-Type": "application/json"},
-                data=json.dumps({"data": player_data}),
+                data=new_player.model_dump_json()
             )
             r.raise_for_status()
-            return r.json()
+            return Player(**r.json()['data']['attributes'])
+        
         except requests.exceptions.HTTPError as err:
             if r.status_code == 400:
                 raise NameAlreadyExistsError
             else:
                 raise err
-
-    def store_game_in_db(self, new_game: Game) -> json:
+            
+    def store_game_in_db(self, new_game: Game) -> Game:
         """Store an instance of Game object in database."""
-        game_data = new_game.model_dump()
-        game_data["game_uuid"] = str(game_data["game_uuid"])
         try:
             r = requests.post(
                 f"{self.API_URL}/games",
                 headers={"Content-Type": "application/json"},
-                data=json.dumps({"data": game_data}),
+                data=new_game.model_dump_json(),
             )
             r.raise_for_status()
-            return r.json()
+            return Game(**r.json()['data']['attributes'])
         except requests.exceptions.HTTPError as err:
             raise err
 
-    def get_games_from_db(self) -> json:
+    def get_games_from_db(self) -> List[Game]:
         """Return a list of all the games stored in database."""
         try:
             r = requests.get(f"{self.API_URL}/games")
             r.raise_for_status()
-            return r.json()
+            games_data = r.json()['data']
+            return [Game(**game['attributes']) for game in games_data]
         except requests.exceptions.HTTPError:
             raise GameNotFoundError
 
-    def get_single_game(self, game_uuid: str):
-        """Retrieve a single game by UUID."""
+    def get_single_game(self, game_uuid: str) -> Game:
+        """Retrieve a single game by UUID and return a Game instance."""
         url = f"{self.API_URL}/games?filters[game_uuid][$eq]={game_uuid}"
         try:
             response = requests.get(url)
@@ -69,9 +69,10 @@ class StrapiApiService:
             games = response.json()
             if not games['data']:
                 raise GameNotFoundError
-            return games['data'][0]
+            return Game(**games['data'][0]['attributes'])
+        
         except requests.exceptions.HTTPError as err:
-            raise GameNotFoundError + err
+            raise GameNotFoundError from err
 
     def get_strapi_game_id(self, game_uuid: str):
         """Retrieve the Strapi ID of a Game."""
@@ -81,29 +82,23 @@ class StrapiApiService:
         except requests.exceptions.HTTPError as err:
             raise GameNotFoundError + err
 
-    def put_add_player(self, player: str, game_uuid: str):
-        game_id = self.get_strapi_game_id(game_uuid)
-        url = f"http://localhost:1337/api/games/{game_id}"
-    
-        current_game = self.get_single_game(game_uuid)
-        players = current_game['attributes'].get('players', [])
-
-
-        if len(players) >= 2:
-            raise GameIsFullError
-
-        if player in players:
-            raise PlayerAlreadyInGameError
+    def update_game_with_new_player(self, player: Player, game: Game) -> Game:
         
-        players.append(player)
-        data = json.dumps({"data": {"players": players}})
+        game.players.append(player)
+        
+        game_data = game.model_dump_json()
+        
+        game_id = self.get_strapi_game_id(str(game.game_uuid))
+        url = f"{self.API_URL}/games/{game_id}"
+
         try: 
             response = requests.put(
                 url,
                 headers={"Content-Type": "application/json"},
-                data=data
+                data=game_data
             )
             response.raise_for_status()
-            return response.json()
+            updated_game_data = response.json()['data']['attributes']
+            return Game(**updated_game_data)
         except requests.exceptions.HTTPError as err:
             raise err
