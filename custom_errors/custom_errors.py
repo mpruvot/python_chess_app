@@ -12,3 +12,6 @@ class PlayernotFoundError(Exception):
 
 class NameAlreadyExistsError(Exception):
     pass
+
+class PlayerAlreadyInGameError(Exception):
+    pass
