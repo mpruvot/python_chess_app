@@ -23,20 +23,25 @@ class StrapiApiService:
     def store_player_in_db(self, new_player: Player) -> Player:
         """Store an instance of player object in database."""
         try:
+            # Convert Player into dict, didn't use model.dump() because UUID is not Json Serializable
+            new_player_json = json.loads(new_player.model_dump_json())
+            
+            payload = json.dumps({"data" : new_player_json})
+            
             r = requests.post(
                 f"{self.API_URL}/players",
                 headers={"Content-Type": "application/json"},
-                data=new_player.model_dump_json()
+                data = payload
             )
             r.raise_for_status()
             return Player(**r.json()['data']['attributes'])
-        
+
         except requests.exceptions.HTTPError as err:
             if r.status_code == 400:
-                raise NameAlreadyExistsError
+                raise NameAlreadyExistsError("A player with this name already exists !")
             else:
-                raise err
-            
+                raise str(err)
+                
     def store_game_in_db(self, new_game: Game) -> Game:
         """Store an instance of Game object in database."""
         try:

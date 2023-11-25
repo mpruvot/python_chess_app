@@ -26,10 +26,6 @@
       },
       "unique": true
     },
-    "player_uuid": {
-      "type": "uid",
-      "required": true
-    },
     "rank": {
       "type": "integer",
       "pluginOptions": {
@@ -53,6 +49,15 @@
           "localized": true
         }
       }
+    },
+    "player_uuid": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "string",
+      "required": true
     }
   }
 }

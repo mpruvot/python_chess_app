@@ -9,10 +9,11 @@ router = APIRouter()
 @router.post('/player/', response_model=Player)
 def new_player(name: str) -> Player:
     """Create a new Player"""
-    try:
+    try : 
         return create_player(name=name)
     except NameAlreadyExistsError as err:
-        raise HTTPException(status_code= 403, detail=str(err))
+        raise str(err)
+
 
 @router.get('/players/', response_model=List[Player])
 def get_players() -> List[Player]:

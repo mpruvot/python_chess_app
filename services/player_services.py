@@ -7,19 +7,19 @@ api_service = StrapiApiService()
 
 def create_player(name: str) -> Player:
     """Create a new Player and store it into strapi_db"""
-    player = Player(name=name)
-    api_service.store_player_in_db(player)
+    try:
+        player = Player(name=name)
+        api_service.store_player_in_db(player)
+    except NameAlreadyExistsError as err:
+        raise err
     return player
 
 def get_all_players() -> Optional[List[Player]]:
     try:
-        data = api_service.get_players_from_db().get('data')
-        if not data:
-            raise PlayernotFoundError('List is empty!')
-        return [Player(**player_data['attributes']) for player_data in data]
+        return api_service.get_players_from_db()
     except PlayernotFoundError:
         raise PlayernotFoundError('No players found')
-
+    
 def get_single_player(name: str) -> Player:
     try:
         players = get_all_players()
