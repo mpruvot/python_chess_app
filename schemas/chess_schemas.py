@@ -9,12 +9,12 @@ class Game(BaseModel):
     is_active : bool = True
     players : List['Player'] = []
     
-    @field_validator('players')
-    @classmethod
-    def check_number_of_players(cls, v: list):
-        if len(v) > 2:
-            raise GameIsFullError('Already two players in the game !')
-        return v
+    #@field_validator('players')
+    #@classmethod
+    #def check_number_of_players(cls, v: list):
+     #   if len(v) >= 2:
+      #      raise GameIsFullError('Already two players in the game !')
+       # return v
             
     
     # State -> probably need to load it from a database

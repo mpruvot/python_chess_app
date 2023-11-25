@@ -94,7 +94,10 @@ class StrapiApiService:
             r = requests.get(f"{self.API_URL}/games")
             r.raise_for_status()
             games_data = r.json()["data"]
+            if not games_data:
+                raise GameNotFoundError("No games found in the database.")
             return [Game(**game["attributes"]) for game in games_data]
+        
         except requests.exceptions.HTTPError:
             raise GameNotFoundError("No games found in the database.")
 
@@ -152,6 +155,10 @@ class StrapiApiService:
             raise PlayerAlreadyInGameError(
                 f"Player {player.name} with uuid : {player.player_uuid} already join this game ! "
             )
+        
+        if len(game.players) == 2:
+            raise GameIsFullError('Already two players in the game !')
+        
         game_id = self.get_strapi_game_id(str(game.game_uuid))
         url = f"{self.API_URL}/games/{game_id}"
 
