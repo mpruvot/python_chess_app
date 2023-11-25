@@ -12,7 +12,7 @@ class Game(BaseModel):
     @field_validator('players')
     @classmethod
     def check_number_of_players(cls, v: list):
-        if len(v) >= 2:
+        if len(v) > 2:
             raise GameIsFullError('Already two players in the game !')
         return v
             

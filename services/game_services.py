@@ -54,8 +54,10 @@ def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     Raises:
         PlayerNotFoundError: If the player with the specified name is not found.
         GameNotFoundError: If the game with the specified UUID is not found.
+        PlayerAlreadyInGameError : If the player already joined the game.
     """
     game = retrieve_single_game(game_uuid)
     player = get_single_player(player_name)
     updated_game = api_service.update_game_with_new_player(player, game)
     return updated_game
+
