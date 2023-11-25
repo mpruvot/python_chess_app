@@ -29,6 +29,8 @@ def join_game(game_uuid: str, player_name: str):
         return add_player_in_game(game_uuid, player_name)
     except GameIsFullError as err:
         raise HTTPException(status_code=403, detail=str(err))
+    except PlayerAlreadyInGameError as err:
+        raise HTTPException(status_code=403, detail=str(err))
 
 @router.get('/games', response_model=list[Game])
 def get_all_games():
