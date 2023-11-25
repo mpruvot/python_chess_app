@@ -12,9 +12,9 @@ def new_player(name: str) -> Player:
     try : 
         return create_player(name=name)
     except NameAlreadyExistsError as err:
-        raise str(err)
+        raise HTTPException(status_code=403, detail=str(err))
 
-
+        
 @router.get('/players/', response_model=List[Player])
 def get_players() -> List[Player]:
     """Returns a list of all players"""

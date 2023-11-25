@@ -7,11 +7,11 @@ api_service = StrapiApiService()
 
 def create_player(name: str) -> Player:
     """Create a new Player and store it into strapi_db"""
-    try:
-        player = Player(name=name)
-        api_service.store_player_in_db(player)
-    except NameAlreadyExistsError as err:
-        raise err
+    if name.capitalize() in [user.name.capitalize() for user in api_service.get_players_from_db()]:
+        raise NameAlreadyExistsError('A player with this name already exists !')
+    
+    player = Player(name=name)
+    api_service.store_player_in_db(player)
     return player
 
 def get_all_players() -> Optional[List[Player]]:
