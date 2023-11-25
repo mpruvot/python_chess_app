@@ -742,7 +742,6 @@ export interface ApiPlayerPlayer extends Schema.CollectionType {
   attributes: {
     name: Attribute.String &
       Attribute.Required &
-      Attribute.Unique &
       Attribute.SetPluginOptions<{
         i18n: {
           localized: true;

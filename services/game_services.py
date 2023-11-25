@@ -2,6 +2,7 @@ from schemas.chess_schemas import Game, Player
 from custom_errors.custom_errors import *
 from database_services.strapi_api_service import StrapiApiService
 from typing import Optional, List
+from services.player_services import *
 
 api_service = StrapiApiService()
 
@@ -24,10 +25,9 @@ def retrieve_single_game(game_uuid: str) -> Game:
     except GameNotFoundError:
         raise GameNotFoundError(f'No game found with UUID: {game_uuid}')
 
-def add_player_in_game(game: Game, player: Player) -> Game:
+def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     """Allows a Player to join an active game which is not already full"""
-    if player in game.players:
-        raise PlayerAlreadyInGameError(f'Player {player.name} is already in the game.')
-    
+    game = retrieve_single_game(game_uuid)
+    player = get_single_player(player_name)
     updated_game = api_service.update_game_with_new_player(player, game)
     return updated_game

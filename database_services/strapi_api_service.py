@@ -22,6 +22,9 @@ class StrapiApiService:
 
     def store_player_in_db(self, new_player: Player) -> Player:
         """Store an instance of player object in database."""
+        if new_player.name.capitalize() in [i.name.capitalize() for i in self.get_players_from_db()]:
+            raise NameAlreadyExistsError('A player with this name already exists !')
+        
         try:
             # Convert Player into dict, didn't use model.dump() because UUID is not Json Serializable
             new_player_json = json.loads(new_player.model_dump_json())
@@ -37,18 +40,17 @@ class StrapiApiService:
             return Player(**r.json()['data']['attributes'])
 
         except requests.exceptions.HTTPError as err:
-            if r.status_code == 400:
-                raise NameAlreadyExistsError("A player with this name already exists !")
-            else:
                 raise str(err)
                 
     def store_game_in_db(self, new_game: Game) -> Game:
         """Store an instance of Game object in database."""
         try:
+            new_game_json = json.loads(new_game.model_dump_json())
+            payload = json.dumps({"data" : new_game_json})
             r = requests.post(
                 f"{self.API_URL}/games",
                 headers={"Content-Type": "application/json"},
-                data=new_game.model_dump_json(),
+                data=payload
             )
             r.raise_for_status()
             return Game(**r.json()['data']['attributes'])
@@ -89,18 +91,18 @@ class StrapiApiService:
 
     def update_game_with_new_player(self, player: Player, game: Game) -> Game:
         
-        game.players.append(player)
-        
-        game_data = game.model_dump_json()
-        
         game_id = self.get_strapi_game_id(str(game.game_uuid))
         url = f"{self.API_URL}/games/{game_id}"
-
+        
+        game.players.append(player)
+        game_data_json = json.loads(game.model_dump_json())
+        payload = json.dumps({"data" : game_data_json})
+        
         try: 
             response = requests.put(
                 url,
                 headers={"Content-Type": "application/json"},
-                data=game_data
+                data=payload
             )
             response.raise_for_status()
             updated_game_data = response.json()['data']['attributes']
