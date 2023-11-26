@@ -194,6 +194,24 @@ class StrapiApiService:
         except requests.exceptions.HTTPError as err:
             raise requests.exceptions.HTTPError(f"HTTP error occurred: {err}")
 
+    def update_fen_of_game(self, game: Game, fen: str) -> Game:
+        game_id = self.get_strapi_game_id(str(game.game_uuid))
+        url = f"{self.API_URL}/games/{game_id}"
+        
+        game.fen = fen
+        game_data_json = json.loads(game.model_dump_json())
+        payload = json.dumps({"data": game_data_json})
+        
+        try:
+            response = requests.put(
+                url, headers={"Content-Type": "application/json"}, data=payload
+            )
+            response.raise_for_status()
+            updated_game_data = response.json()["data"]["attributes"]
+            return Game(**updated_game_data)
+        except requests.exceptions.HTTPError as err:
+            raise requests.exceptions.HTTPError(f"HTTP error occurred: {err}")
+        
     def delete_player_from_db(self, player_name: str):
         """
         Delete a player from the database by their name.

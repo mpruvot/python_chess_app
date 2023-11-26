@@ -36,6 +36,14 @@
           "localized": true
         }
       }
+    },
+    "fen": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "string"
     }
   }
 }

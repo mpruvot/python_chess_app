@@ -1,4 +1,5 @@
 from schemas.chess_schemas import Game, Player
+from chess_app.chess_engine import *
 from custom_errors.custom_errors import *
 from database_services.strapi_api_service import StrapiApiService
 from typing import Optional, List
@@ -16,7 +17,6 @@ def create_game() -> Game:
     game = Game()
     return api_service.store_game_in_db(game)
 
-
 def retrieve_all_games() -> Optional[List[Game]]:
     """
     Retrieve a list of all the games from the database.
@@ -29,7 +29,6 @@ def retrieve_all_games() -> Optional[List[Game]]:
         return api_service.get_games_from_db()
     except GameNotFoundError:
         raise GameNotFoundError("List of games is empty!")
-
 
 def retrieve_single_game(game_uuid: str) -> Game:
     """
@@ -45,7 +44,6 @@ def retrieve_single_game(game_uuid: str) -> Game:
         return api_service.get_single_game(game_uuid)
     except GameNotFoundError:
         raise GameNotFoundError(f"No game found with UUID: {game_uuid}")
-
 
 def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     """
@@ -64,3 +62,23 @@ def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     player = get_single_player(player_name)
     updated_game = api_service.update_game_with_new_player(player, game)
     return updated_game
+
+def init_game(game_uuid: str):
+    """Starts a Game if two players joined the Game, init an FEN code to the Game instance
+
+    Args:
+        game_uuid (str): Uuid of the Game
+    """
+    game = retrieve_single_game(game_uuid)
+    if len(game.players) != 2:
+        raise NotActiveGameError(f'Not enough Players in the Game: {len(game.players)} joined')
+    try:
+        player_1 = game.players[0].name
+        player_2 = game.players[1].name
+        chess_engine = GameOfChess(name_player_1=player_1, name_player_2=player_2)
+        fen = chess_engine.return_fen()
+        updated_game = api_service.update_fen_of_game(game=game, fen=fen)
+        return updated_game
+    
+    except GameNotFoundError:
+        raise GameNotFoundError(f"No game found with UUID: {game_uuid}")

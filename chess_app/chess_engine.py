@@ -13,6 +13,9 @@ class GameOfChess:
         self.player_2_color = 'Black' if self.player_1_color == 'White' else 'White'
         self.current_turn = self.player_1 if self.player_1_color == "White" else self.player_2
         
+    def return_fen(self):
+        return self.board.fen()
+    
     def init_board(self, fen : str):
         """Initialize a ChessBoard from a Valid FEN
         Args:
