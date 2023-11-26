@@ -70,6 +70,8 @@ def init_game(game_uuid: str):
         game_uuid (str): Uuid of the Game
     """
     game = retrieve_single_game(game_uuid)
+    if game.fen:
+        raise GameAlreadyStartedError(f'Game already started with fen : {game.fen}')
     if len(game.players) != 2:
         raise NotActiveGameError(f'Not enough Players in the Game: {len(game.players)} joined')
     try:
