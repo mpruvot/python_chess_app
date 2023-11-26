@@ -9,6 +9,8 @@ class Game(BaseModel):
     game_uuid: uuid.UUID = Field(default_factory=uuid.uuid4)
     is_active: bool = True
     players: List["Player"] = []
+    turn : Optional[str] = ""
+    fen: Optional[str] = None
 
     # @field_validator('players')
     # @classmethod
@@ -28,6 +30,7 @@ class Player(BaseModel):
     rank: Optional[int] = None
     friends: List["Player"] = []
     active_games: List[Game] = []
+    color: Optional[str] = None
 
 
 Game.model_rebuild()
