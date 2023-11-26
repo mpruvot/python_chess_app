@@ -72,3 +72,14 @@ def delete_game_by_id(game_uuid : str):
         return delete_game(game_uuid)
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
+
+@router.post("/game/{game_uuid}/")
+def start_game(game_uuid: str):
+    try:
+        return init_game(game_uuid)
+    except NotActiveGameError as err:
+        raise HTTPException(status_code=403, detail=str(err))
+    except GameNotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
+    except GameAlreadyStartedError as err:
+        raise HTTPException(status_code=403, detail=str(err))
