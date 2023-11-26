@@ -97,7 +97,7 @@ class StrapiApiService:
             if not games_data:
                 raise GameNotFoundError("No games found in the database.")
             return [Game(**game["attributes"]) for game in games_data]
-        
+
         except requests.exceptions.HTTPError:
             raise GameNotFoundError("No games found in the database.")
 
@@ -142,6 +142,24 @@ class StrapiApiService:
                 f"Game with UUID {game_uuid} not found. HTTP error: {err}"
             )
 
+    def get_strapi_player_id(self, player_name: str):
+        """
+        Retrieve the Strapi ID of a Player.
+        Args:
+            player_name (str): The UUID of the Player.
+        Raises:
+            PlayerNotFoundError: If the Player with the given namm is not found.
+        """
+        url = f"{self.API_URL}/players?filters[name][$eq]={player_name.capitalize()}"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            print (response.json())
+            id = response.json()["data"][0].get("id")
+            return id
+        except requests.exceptions.HTTPError as err:
+            raise PlayernotFoundError(f"Player with name {player_name} not found !")
+
     def update_game_with_new_player(self, player: Player, game: Game) -> Game:
         """
         Update a game with a new player.
@@ -155,10 +173,10 @@ class StrapiApiService:
             raise PlayerAlreadyInGameError(
                 f"Player {player.name} with uuid : {player.player_uuid} already join this game ! "
             )
-        
+
         if len(game.players) == 2:
-            raise GameIsFullError('Already two players in the game !')
-        
+            raise GameIsFullError("Already two players in the game !")
+
         game_id = self.get_strapi_game_id(str(game.game_uuid))
         url = f"{self.API_URL}/games/{game_id}"
 
@@ -175,3 +193,41 @@ class StrapiApiService:
             return Game(**updated_game_data)
         except requests.exceptions.HTTPError as err:
             raise requests.exceptions.HTTPError(f"HTTP error occurred: {err}")
+
+    def delete_player_from_db(self, player_name: str):
+        """
+        Delete a player from the database by their name.
+        Args:
+            player_name (str): The name of the player to be deleted.
+        Returns:
+            The content of the response from the DELETE request if successful.
+        Raises:
+            PlayernotFoundError: If the player with the given name cannot be found or if there is an HTTP error during the deletion process, indicating that the player could not be deleted.
+        """
+        player_strpi_id = self.get_strapi_player_id(player_name)
+        try:
+            r = requests.delete(f"{self.API_URL}/players/{player_strpi_id}")
+            r.raise_for_status()
+            return r.json()
+        except requests.exceptions.HTTPError as err:
+            raise PlayernotFoundError(
+                f"Player {player_name} not found and canno't be deleted. HTTP error: {err}"
+            )
+    
+    def delete_game_from_db(self, game_uuid: str):
+        """
+        Delete a game from the database by its UUID.
+        Args:
+            game_uuid (str): The UUID of the game to be deleted.
+        Returns:
+            The content of the response from the DELETE request if successful.
+        Raises:
+            GameNotFoundError: If the game with the given UUID cannot be found or if there is an HTTP error during the deletion process, indicating that the game could not be deleted.
+        """
+        game_strapi_id = self.get_strapi_game_id(game_uuid)
+        try:
+            response = requests.delete(f'{self.API_URL}/games/{game_strapi_id}')
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.HTTPError as err:
+            raise GameNotFoundError(f'Game with UUID {game_uuid} not found and cannot be deleted. HTTP error: {err}')
