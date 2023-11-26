@@ -33,5 +33,10 @@ class PlayerAlreadyInGameError(Exception):
 
     pass
 
+class InvalidTurnError(Exception):
+    """It's not your turn to play !"""
+    pass
 
+class GameOverError(Exception):
+    pass
 # https://www.programiz.com/python-programming/user-defined-exception
