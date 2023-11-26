@@ -63,6 +63,17 @@ def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     updated_game = api_service.update_game_with_new_player(player, game)
     return updated_game
 
+def search_and_join_game(player_name: str):
+    games = retrieve_all_games()
+    available_game = [game for game in games if len(game.players) != 2]
+    player = get_single_player(player_name)
+    if not available_game:
+        raise GameNotFoundError('No game available at the moment, please create a game first.')
+    if available_game and player in available_game[0]:
+        raise PlayerAlreadyInGameError(f'Player {player.name} with uuid : {player.player_uuid} already join this game ! Please try to create another Game')
+    updated_game = api_service.update_game_with_new_player(player, available_game[0])
+    return updated_game
+
 def init_game(game_uuid: str):
     """Starts a Game if two players joined the Game, init an FEN code to the Game instance
 

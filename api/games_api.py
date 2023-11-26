@@ -34,6 +34,16 @@ def join_game(game_uuid: str, player_name: str):
     except PlayerAlreadyInGameError as err:
         raise HTTPException(status_code=403, detail=str(err))
 
+@router.patch("/join/{player_name}", response_model=Game)
+def join_free_game(player_name: str):
+    try:
+        return search_and_join_game(player_name)
+    except GameNotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
+    except PlayernotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
+    except PlayerAlreadyInGameError as err:
+        raise HTTPException(status_code=403, detail=str(err))
 
 @router.get("/games", response_model=list[Game])
 def get_all_games():
