@@ -79,6 +79,7 @@ def init_game(game_uuid: str):
         player_2 = game.players[1].name
         chess_engine = GameOfChess(name_player_1=player_1, name_player_2=player_2)
         fen = chess_engine.return_fen()
+        game.is_active = True
         updated_game = api_service.update_fen_of_game(game=game, fen=fen)
         return updated_game
     

@@ -83,3 +83,4 @@ def start_game(game_uuid: str):
         raise HTTPException(status_code=404, detail=str(err))
     except GameAlreadyStartedError as err:
         raise HTTPException(status_code=403, detail=str(err))
+    
