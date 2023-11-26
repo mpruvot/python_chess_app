@@ -1,12 +1,18 @@
 from fastapi import APIRouter, HTTPException, status
 from schemas.chess_schemas import Player
-from services.player_services import create_player, get_all_players, get_single_player
+from services.player_services import *
 from custom_errors.custom_errors import *
 from typing import List
 
 router = APIRouter()
 
-@router.post('/player/', response_model=Player)
+
+@router.get("/")
+def home_page():
+    return {"message": "Chess API"}
+
+
+@router.post("/player/", response_model=Player)
 def new_player(name: str) -> Player:
     """
     Endpoint to create a new player.
@@ -17,12 +23,13 @@ def new_player(name: str) -> Player:
     Raises:
         HTTPException: If a player with the same name already exists.
     """
-    try : 
+    try:
         return create_player(name=name)
     except NameAlreadyExistsError as err:
         raise HTTPException(status_code=403, detail=str(err))
 
-@router.get('/players/', response_model=List[Player])
+
+@router.get("/players/", response_model=List[Player])
 def get_players() -> List[Player]:
     """
     Endpoint to retrieve a list of all players.
@@ -36,7 +43,8 @@ def get_players() -> List[Player]:
     except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
-@router.get('/player/{name}', response_model=Player)
+
+@router.get("/player/{name}", response_model=Player)
 def return_player_by_name(name: str) -> Player:
     """
     Endpoint to retrieve a single player by name.
@@ -51,3 +59,11 @@ def return_player_by_name(name: str) -> Player:
         return get_single_player(name)
     except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
+
+@router.delete("/player/{name}")
+def delete_player_by_name(name : str):
+    try:
+        return delete_player(name)
+    except PlayernotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
+
