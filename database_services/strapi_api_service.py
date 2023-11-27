@@ -195,6 +195,16 @@ class StrapiApiService:
             raise requests.exceptions.HTTPError(f"HTTP error occurred: {err}")
 
     def update_fen_of_game(self, game: Game, fen: str) -> Game:
+        """
+        Updates the FEN of a game instance.
+        Args:
+            game (Game): The game to be updated.
+            fen (str): The FEN string to update the game with.
+        Returns:
+            Game: The updated game instance.
+        Raises:
+            HTTPError: If there is an HTTP error during the request.
+        """
         game_id = self.get_strapi_game_id(str(game.game_uuid))
         url = f"{self.API_URL}/games/{game_id}"
         

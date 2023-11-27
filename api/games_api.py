@@ -46,17 +46,30 @@ def join_free_game(player_name: str):
         raise HTTPException(status_code=403, detail=str(err))
 
 @router.get("/games", response_model=list[Game])
-def get_all_games():
+def get_all_games(player_name : str | None = None):
     """
     Endpoint to retrieve a list of all games.
+    if a player name is specified, retrives all the games with the specified player.
+    
     Returns:
-        list[Game]: A list of all game instances.
+        list[Game]: A list of all game instances. or with a specified name
     Raises:
         HTTPException: If no games are found.
     """
+    
     try:
-        return retrieve_all_games()
+        games = retrieve_all_games()
+        if player_name:
+            player = get_single_player(player_name)
+            games_with_specified_player = [game for game in games if player in game.players]
+            if games_with_specified_player:
+                return games_with_specified_player
+            else:
+                raise GameNotFoundError(f'No game Found with player : {player_name.capitalize()}')
+        return games
     except GameNotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
+    except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
 
@@ -94,3 +107,10 @@ def start_game(game_uuid: str):
     except GameAlreadyStartedError as err:
         raise HTTPException(status_code=403, detail=str(err))
     
+
+@router.post('/game/{player}')
+def new_game_and_join(player: str):
+    try:
+        return create_and_join_game(player)
+    except PlayernotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
