@@ -25,7 +25,6 @@ def create_player(name: str) -> Player:
     api_service.store_player_in_db(player)
     return player
 
-
 def get_all_players() -> Optional[List[Player]]:
     """
     Retrieve all players from the database.
@@ -38,7 +37,6 @@ def get_all_players() -> Optional[List[Player]]:
         return api_service.get_players_from_db()
     except PlayernotFoundError:
         raise PlayernotFoundError("No players found in the database.")
-
 
 def get_single_player(name: str) -> Player:
     """
