@@ -34,6 +34,7 @@ def join_game(game_uuid: str, player_name: str):
     except PlayerAlreadyInGameError as err:
         raise HTTPException(status_code=403, detail=str(err))
 
+
 @router.patch("/join/{player_name}", response_model=Game)
 def join_free_game(player_name: str):
     try:
@@ -45,27 +46,32 @@ def join_free_game(player_name: str):
     except PlayerAlreadyInGameError as err:
         raise HTTPException(status_code=403, detail=str(err))
 
+
 @router.get("/games", response_model=list[Game])
-def get_all_games(player_name : str | None = None):
+def get_all_games(player_name: str | None = None):
     """
     Endpoint to retrieve a list of all games.
     if a player name is specified, retrives all the games with the specified player.
-    
+
     Returns:
         list[Game]: A list of all game instances. or with a specified name
     Raises:
         HTTPException: If no games are found.
     """
-    
+
     try:
         games = retrieve_all_games()
         if player_name:
             player = get_single_player(player_name)
-            games_with_specified_player = [game for game in games if player in game.players]
+            games_with_specified_player = [
+                game for game in games if player in game.players
+            ]
             if games_with_specified_player:
                 return games_with_specified_player
             else:
-                raise GameNotFoundError(f'No game Found with player : {player_name.capitalize()}')
+                raise GameNotFoundError(
+                    f"No game Found with player : {player_name.capitalize()}"
+                )
         return games
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
@@ -89,26 +95,17 @@ def get_single_game(game_uuid: str):
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
+
 @router.delete("/game/{game_uuid}")
-def delete_game_by_id(game_uuid : str):
+def delete_game_by_id(game_uuid: str):
     try:
         return delete_game(game_uuid)
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
-@router.post("/game/{game_uuid}/")
-def start_game(game_uuid: str):
-    try:
-        return init_game(game_uuid)
-    except NotActiveGameError as err:
-        raise HTTPException(status_code=403, detail=str(err))
-    except GameNotFoundError as err:
-        raise HTTPException(status_code=404, detail=str(err))
-    except GameAlreadyStartedError as err:
-        raise HTTPException(status_code=403, detail=str(err))
-    
 
-@router.post('/game/{player}')
+
+@router.post("/game/{player}")
 def new_game_and_join(player: str):
     try:
         return create_and_join_game(player)
