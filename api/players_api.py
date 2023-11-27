@@ -60,10 +60,10 @@ def return_player_by_name(name: str) -> Player:
     except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
+
 @router.delete("/player/{name}")
-def delete_player_by_name(name : str):
+def delete_player_by_name(name: str):
     try:
         return delete_player(name)
     except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
-

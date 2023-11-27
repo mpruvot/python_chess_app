@@ -17,6 +17,7 @@ def create_game() -> Game:
     game = Game()
     return api_service.store_game_in_db(game)
 
+
 def retrieve_all_games() -> Optional[List[Game]]:
     """
     Retrieve a list of all the games from the database.
@@ -29,6 +30,7 @@ def retrieve_all_games() -> Optional[List[Game]]:
         return api_service.get_games_from_db()
     except GameNotFoundError:
         raise GameNotFoundError("List of games is empty!")
+
 
 def retrieve_single_game(game_uuid: str) -> Game:
     """
@@ -44,6 +46,7 @@ def retrieve_single_game(game_uuid: str) -> Game:
         return api_service.get_single_game(game_uuid)
     except GameNotFoundError:
         raise GameNotFoundError(f"No game found with UUID: {game_uuid}")
+
 
 def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     """
@@ -63,16 +66,51 @@ def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     updated_game = api_service.update_game_with_new_player(player, game)
     return updated_game
 
+
+def create_and_join_game(player_name: str):
+    """
+    Creates a new game and adds a player to it.
+
+    Args:
+        player_name (str): The name of the player joining the new game.
+
+    Returns:
+        The updated game instance with the player added.
+    """
+    player = get_single_player(player_name)
+    game = create_game()
+    updated_game = api_service.update_game_with_new_player(player, game)
+    return updated_game
+
+
 def search_and_join_game(player_name: str):
+    """
+    Searches for an available game and adds a player to it.
+
+    Args:
+        player_name (str): The name of the player looking to join a game.
+
+    Returns:
+        The updated game instance with the player added.
+
+    Raises:
+        GameNotFoundError: If no available games are found.
+        PlayerAlreadyInGameError: If the player is already in the selected game.
+    """
     games = retrieve_all_games()
     available_game = [game for game in games if len(game.players) != 2]
     player = get_single_player(player_name)
     if not available_game:
-        raise GameNotFoundError('No game available at the moment, please create a game first.')
+        raise GameNotFoundError(
+            "No game available at the moment, please create a game first."
+        )
     if available_game and player in available_game[0]:
-        raise PlayerAlreadyInGameError(f'Player {player.name} with uuid : {player.player_uuid} already join this game ! Please try to create another Game')
+        raise PlayerAlreadyInGameError(
+            f"Player {player.name} with uuid : {player.player_uuid} already join this game ! Please try to create another Game"
+        )
     updated_game = api_service.update_game_with_new_player(player, available_game[0])
     return updated_game
+
 
 def init_game(game_uuid: str):
     """Starts a Game if two players joined the Game, init an FEN code to the Game instance
@@ -82,9 +120,11 @@ def init_game(game_uuid: str):
     """
     game = retrieve_single_game(game_uuid)
     if game.fen:
-        raise GameAlreadyStartedError(f'Game already started with fen : {game.fen}')
+        raise GameAlreadyStartedError(f"Game already started with fen : {game.fen}")
     if len(game.players) != 2:
-        raise NotActiveGameError(f'Not enough Players in the Game: {len(game.players)} joined')
+        raise NotActiveGameError(
+            f"Not enough Players in the Game: {len(game.players)} joined"
+        )
     try:
         player_1 = game.players[0].name
         player_2 = game.players[1].name
@@ -93,6 +133,6 @@ def init_game(game_uuid: str):
         game.is_active = True
         updated_game = api_service.update_fen_of_game(game=game, fen=fen)
         return updated_game
-    
+
     except GameNotFoundError:
         raise GameNotFoundError(f"No game found with UUID: {game_uuid}")
