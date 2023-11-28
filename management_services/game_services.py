@@ -1,5 +1,5 @@
 from database_services.strapi_api_service import StrapiApiService
-from schemas.chess_schemas import Game
+from schemas.chess_schemas import Game, Player
 from custom_errors.custom_errors import *
 from typing import Optional, List
 from chess_services.chess_engine_services import start_new_game
@@ -55,6 +55,19 @@ def retrieve_single_game(game_uuid: str) -> Game:
     except GameNotFoundError:
         raise GameNotFoundError(f"No game found with UUID: {game_uuid}")
 
+def _update_game_with_player(game: Game, player: Player) -> Game:
+    """
+    Updates a game instance with a new player and starts the game if two players have joined.
+    Args:
+        game (Game): The game instance to update.
+        player (Player): The player to add to the game.
+    Returns:
+        Game: The updated game instance.
+    """
+    updated_game = api_service.update_game_with_new_player(player, game)
+    if len(updated_game.players) == 2:
+        return start_new_game(game_uuid=game.game_uuid)
+    return updated_game
 
 def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     """
@@ -72,10 +85,7 @@ def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     """
     game = retrieve_single_game(game_uuid)
     player = get_single_player(player_name)
-    updated_game = api_service.update_game_with_new_player(player, game)
-    if len(updated_game.players) == 2:
-        return start_new_game(game_uuid=game_uuid)
-    return updated_game
+    return _update_game_with_player(game, player)
 
 
 def create_and_join_game(player_name: str):
@@ -90,9 +100,7 @@ def create_and_join_game(player_name: str):
     """
     player = get_single_player(player_name)
     game = create_game()
-    updated_game = api_service.update_game_with_new_player(player, game)
-    return updated_game
-
+    return _update_game_with_player(game, player)
 
 def search_and_join_game(player_name: str):
     """
@@ -109,15 +117,17 @@ def search_and_join_game(player_name: str):
         PlayerAlreadyInGameError: If the player is already in the selected game.
     """
     games = retrieve_all_games()
-    available_game = [game for game in games if len(game.players) != 2]
-    player = get_single_player(player_name)
-    if not available_game:
+    available_games = [game for game in games if len(game.players) != 2]
+    if not available_games:
         raise GameNotFoundError(
             "No game available at the moment, please create a game first."
         )
-    if available_game and player in available_game[0]:
+        
+    player = get_single_player(player_name)
+    selected_game = available_games[0]
+    
+    if player in selected_game.players:
         raise PlayerAlreadyInGameError(
             f"Player {player.name} with uuid : {player.player_uuid} already join this game ! Please try to create another Game"
         )
-    updated_game = api_service.update_game_with_new_player(player, available_game[0])
-    return updated_game
+    return _update_game_with_player(selected_game, player)
