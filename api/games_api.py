@@ -1,6 +1,24 @@
-from fastapi import APIRouter, HTTPException, status
-from schemas.chess_schemas import Game, Player
-from services.game_services import *
+from fastapi import APIRouter, HTTPException
+from custom_errors.custom_errors import (
+    GameIsFullError,
+    GameNotFoundError,
+    PlayerAlreadyInGameError,
+    PlayernotFoundError,
+)
+from management_services.player_services import get_single_player
+
+from schemas.chess_schemas import Game
+from management_services.game_services import (
+    add_player_in_game,
+    create_and_join_game,
+    create_game,
+    delete_game,
+    retrieve_all_games,
+    retrieve_single_game,
+    search_and_join_game,
+)
+
+
 
 router = APIRouter()
 
@@ -92,6 +110,7 @@ def get_single_game(game_uuid: str):
     """
     try:
         return retrieve_single_game(game_uuid)
+
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
@@ -102,7 +121,6 @@ def delete_game_by_id(game_uuid: str):
         return delete_game(game_uuid)
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
-
 
 
 @router.post("/game/{player}")

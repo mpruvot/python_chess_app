@@ -1,11 +1,10 @@
-from schemas.chess_schemas import Game, Player
-from chess_app.chess_engine import *
-from custom_errors.custom_errors import *
 from database_services.strapi_api_service import StrapiApiService
+from schemas.chess_schemas import Game
+from custom_errors.custom_errors import *
 from typing import Optional, List
-from services.chess_engine_services import *
-from services.player_services import *
+from chess_services.chess_engine_services import start_new_game
 
+from management_services.player_services import get_single_player
 
 api_service = StrapiApiService()
 
@@ -18,6 +17,13 @@ def create_game() -> Game:
     """
     game = Game()
     return api_service.store_game_in_db(game)
+
+
+def delete_game(game_uuid: str):
+    try:
+        api_service.delete_game_from_db(game_uuid)
+    except GameNotFoundError as err:
+        raise err
 
 
 def retrieve_all_games() -> Optional[List[Game]]:
@@ -52,7 +58,8 @@ def retrieve_single_game(game_uuid: str) -> Game:
 
 def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     """
-    Allows a Player to join an active game which is not already full.
+    Allows a Player to join an active game which is not already full
+    strat a game if two players joined.
     Args:
         game_uuid (str): The UUID of the game to join.
         player_name (str): The name of the player joining the game.
@@ -66,6 +73,8 @@ def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     game = retrieve_single_game(game_uuid)
     player = get_single_player(player_name)
     updated_game = api_service.update_game_with_new_player(player, game)
+    if len(updated_game.players) == 2:
+        return start_new_game(game_uuid=game_uuid)
     return updated_game
 
 

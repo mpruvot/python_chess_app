@@ -1,6 +1,4 @@
-from fastapi import FastAPI, HTTPException
-from typing import Optional
-from pydantic import BaseModel, Field
+from fastapi import FastAPI
 from api import games_api, players_api, chess_engine_api
 
 
