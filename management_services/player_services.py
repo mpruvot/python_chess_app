@@ -1,7 +1,8 @@
-from schemas.chess_schemas import Game, Player
-from custom_errors.custom_errors import *
+from typing import List, Optional
+from custom_errors.custom_errors import GameNotFoundError, NameAlreadyExistsError, PlayernotFoundError
 from database_services.strapi_api_service import StrapiApiService
-from typing import Optional, List
+from schemas.chess_schemas import Player
+
 
 api_service = StrapiApiService()
 
@@ -25,6 +26,13 @@ def create_player(name: str) -> Player:
     api_service.store_player_in_db(player)
     return player
 
+def delete_player(player_name: str):
+    try:
+        api_service.delete_player_from_db(player_name)
+    except PlayernotFoundError as err:
+        raise err
+
+
 def get_all_players() -> Optional[List[Player]]:
     """
     Retrieve all players from the database.
@@ -37,6 +45,7 @@ def get_all_players() -> Optional[List[Player]]:
         return api_service.get_players_from_db()
     except PlayernotFoundError:
         raise PlayernotFoundError("No players found in the database.")
+
 
 def get_single_player(name: str) -> Player:
     """
@@ -60,14 +69,4 @@ def get_single_player(name: str) -> Player:
     except PlayernotFoundError:
         raise PlayernotFoundError(f"Error retrieving player with name: {name}")
 
-def delete_player(player_name : str):
-    try:
-        api_service.delete_player_from_db(player_name)
-    except PlayernotFoundError as err:
-        raise err
 
-def delete_game(game_uuid: str):
-    try:
-        api_service.delete_game_from_db(game_uuid)
-    except GameNotFoundError as err:
-        raise err

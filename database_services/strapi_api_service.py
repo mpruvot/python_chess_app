@@ -1,8 +1,15 @@
-import requests
 import json
-from schemas.chess_schemas import Player, Game
-from custom_errors.custom_errors import *
 from typing import List
+import requests
+from custom_errors.custom_errors import (
+    GameIsFullError,
+    GameNotFoundError,
+    NameAlreadyExistsError,
+    PlayerAlreadyInGameError,
+    PlayernotFoundError,
+)
+
+from schemas.chess_schemas import Game, Player
 
 
 class StrapiApiService:
@@ -154,7 +161,7 @@ class StrapiApiService:
         try:
             response = requests.get(url)
             response.raise_for_status()
-            print (response.json())
+            print(response.json())
             id = response.json()["data"][0].get("id")
             return id
         except requests.exceptions.HTTPError as err:
@@ -207,11 +214,11 @@ class StrapiApiService:
         """
         game_id = self.get_strapi_game_id(str(game.game_uuid))
         url = f"{self.API_URL}/games/{game_id}"
-        
+
         game.fen = fen
         game_data_json = json.loads(game.model_dump_json())
         payload = json.dumps({"data": game_data_json})
-        
+
         try:
             response = requests.put(
                 url, headers={"Content-Type": "application/json"}, data=payload
@@ -221,7 +228,7 @@ class StrapiApiService:
             return Game(**updated_game_data)
         except requests.exceptions.HTTPError as err:
             raise requests.exceptions.HTTPError(f"HTTP error occurred: {err}")
-        
+
     def delete_player_from_db(self, player_name: str):
         """
         Delete a player from the database by their name.
@@ -241,7 +248,7 @@ class StrapiApiService:
             raise PlayernotFoundError(
                 f"Player {player_name} not found and canno't be deleted. HTTP error: {err}"
             )
-    
+
     def delete_game_from_db(self, game_uuid: str):
         """
         Delete a game from the database by its UUID.
@@ -254,8 +261,10 @@ class StrapiApiService:
         """
         game_strapi_id = self.get_strapi_game_id(game_uuid)
         try:
-            response = requests.delete(f'{self.API_URL}/games/{game_strapi_id}')
+            response = requests.delete(f"{self.API_URL}/games/{game_strapi_id}")
             response.raise_for_status()
             return response.json()
         except requests.exceptions.HTTPError as err:
-            raise GameNotFoundError(f'Game with UUID {game_uuid} not found and cannot be deleted. HTTP error: {err}')
+            raise GameNotFoundError(
+                f"Game with UUID {game_uuid} not found and cannot be deleted. HTTP error: {err}"
+            )
