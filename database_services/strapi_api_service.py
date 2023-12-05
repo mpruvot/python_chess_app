@@ -167,6 +167,32 @@ class StrapiApiService:
         except requests.exceptions.HTTPError as err:
             raise PlayernotFoundError(f"Player with name {player_name} not found !")
 
+
+    def update_player_active_games(self, player: Player, game : Game = None) -> Player:
+        if game in player.active_games:
+            raise PlayerAlreadyInGameError(
+                f"Player {player.name} with uuid : {player.player_uuid} already join this game ! "
+            )
+        player_id = self.get_strapi_player_id(player_name=player.name)
+        url = f"{self.API_URL}/players/{player_id}"
+        if game:
+            player.active_games.append(game.game_uuid)
+            
+        player_data_json = json.loads(player.model_dump_json())
+        payload = json.dumps({"data": player_data_json})
+    
+
+        
+        try:
+            response = requests.put(
+                url, headers={"Content-Type": "application/json"}, data=payload
+            )
+            response.raise_for_status()
+            updated_player_data = response.json()["data"]["attributes"]
+            return Player(**updated_player_data)
+        except requests.exceptions.HTTPError as err:
+            raise requests.exceptions.HTTPError(f"HTTP error occurred: {err}")
+    
     def update_game_with_new_player(self, player: Player, game: Game) -> Game:
         """
         Update a game with a new player.
@@ -186,9 +212,11 @@ class StrapiApiService:
 
         game_id = self.get_strapi_game_id(str(game.game_uuid))
         url = f"{self.API_URL}/games/{game_id}"
+        updated_player = self.update_player_active_games(player, game)
 
-        game.players.append(player)
+        game.players.append(updated_player)
         game_data_json = json.loads(game.model_dump_json())
+    
         payload = json.dumps({"data": game_data_json})
 
         try:

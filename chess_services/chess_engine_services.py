@@ -42,6 +42,9 @@ def start_new_game(game_uuid: str):
 
 
 def make_a_move(game_uuid: str, player_name: str, move: str) -> str:
+    ### Here to avoid circular import
+    from management_services.game_services import retrieve_single_game
+    ###
     game = retrieve_single_game(game_uuid)
     if not game.is_active:
         raise NotActiveGameError(
@@ -51,4 +54,9 @@ def make_a_move(game_uuid: str, player_name: str, move: str) -> str:
     chess_engine = GameOfChess(
         name_player_1=game.players[0].name, name_player_2=game.players[1].name
     )
-    pass
+    
+    chess_engine.init_board(game.fen)
+    
+    chess_engine.make_move(move, player_name=player_name)
+    updated_game = api_service.update_fen_of_game(game=game, fen=chess_engine.return_fen())
+    return updated_game
