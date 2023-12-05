@@ -1,11 +1,15 @@
 from fastapi import APIRouter, HTTPException
+import chess
 from custom_errors.custom_errors import (
     GameAlreadyStartedError,
     GameNotFoundError,
+    GameOverError,
+    InvalidTurnError,
     NotActiveGameError,
 )
 
-from chess_services.chess_engine_services import start_new_game
+from chess_services.chess_engine_services import make_a_move, start_new_game
+from schemas.chess_schemas import Game
 
 
 router = APIRouter()
@@ -21,3 +25,15 @@ def start_game(game_uuid: str):
         raise HTTPException(status_code=404, detail=str(err))
     except GameAlreadyStartedError as err:
         raise HTTPException(status_code=403, detail=str(err))
+
+@router.post("/game/move/{game_uuid}/{player_name}/{move}")
+def make_move(game_uuid, player_name, move) -> Game:
+    try:
+        return make_a_move(game_uuid=game_uuid, player_name=player_name, move=move)
+    except NotActiveGameError as err:
+        raise HTTPException(status_code=403, detail=str(err))
+    except GameNotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
+    except (chess.InvalidMoveError, chess.IllegalMoveError, InvalidTurnError, GameOverError) as err:
+        raise HTTPException(status_code=404, detail=str(err))
+        

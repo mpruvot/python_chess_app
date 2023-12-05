@@ -66,7 +66,7 @@ class GameOfChess:
 
         if player_name.capitalize() != self.current_turn.capitalize():
             raise InvalidTurnError(
-                f"Not your turn, {self.current_turn} needs to play first."
+                f"Not your turn, {self.current_turn} needs to play first"
             )
         try:
             self.board.push_san(move)
@@ -78,7 +78,7 @@ class GameOfChess:
 
         except chess.IllegalMoveError as err:
             raise chess.InvalidMoveError(
-                f"The move '{move}' is illegal in the current position."
+                f"The move '{move}' is illegal in the current position: {err}"
             )
 
 

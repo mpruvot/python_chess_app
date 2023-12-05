@@ -28,7 +28,7 @@ class Player(BaseModel):
     player_uuid: uuid.UUID = Field(default_factory=uuid.uuid4)
     rank: Optional[int] = None
     friends: List["Player"] = []
-    active_games: List[Game] = []
+    active_games: List[uuid.UUID] = []
     color: Optional[str] = None
 
 

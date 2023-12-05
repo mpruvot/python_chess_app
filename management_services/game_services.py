@@ -21,7 +21,15 @@ def create_game() -> Game:
 
 def delete_game(game_uuid: str):
     try:
+        game_to_delete = api_service.get_single_game(game_uuid)
+        if len(game_to_delete.players) >= 1:
+            for player in game_to_delete.players:
+                if game_to_delete.game_uuid in player.active_games:
+                    player.active_games.remove(game_to_delete.game_uuid)
+                    api_service.update_player_active_games(player=player)
+            
         api_service.delete_game_from_db(game_uuid)
+        return {"message" : f"successfully deleted game {game_to_delete}"}
     except GameNotFoundError as err:
         raise err
 
@@ -55,6 +63,7 @@ def retrieve_single_game(game_uuid: str) -> Game:
     except GameNotFoundError:
         raise GameNotFoundError(f"No game found with UUID: {game_uuid}")
 
+
 def _update_game_with_player(game: Game, player: Player) -> Game:
     """
     Updates a game instance with a new player and starts the game if two players have joined.
@@ -68,6 +77,7 @@ def _update_game_with_player(game: Game, player: Player) -> Game:
     if len(updated_game.players) == 2:
         return start_new_game(game_uuid=game.game_uuid)
     return updated_game
+
 
 def add_player_in_game(game_uuid: str, player_name: str) -> Game:
     """
@@ -102,6 +112,7 @@ def create_and_join_game(player_name: str):
     game = create_game()
     return _update_game_with_player(game, player)
 
+
 def search_and_join_game(player_name: str):
     """
     Searches for an available game and adds a player to it.
@@ -122,10 +133,10 @@ def search_and_join_game(player_name: str):
         raise GameNotFoundError(
             "No game available at the moment, please create a game first."
         )
-        
+
     player = get_single_player(player_name)
     selected_game = available_games[0]
-    
+
     if player in selected_game.players:
         raise PlayerAlreadyInGameError(
             f"Player {player.name} with uuid : {player.player_uuid} already join this game ! Please try to create another Game"
