@@ -17,20 +17,12 @@ def create_player(name: str) -> Player:
     Raises:
         NameAlreadyExistsError: If a player with the same name already exists in the database.
     """
-    if name.capitalize() in [
-        user.name.capitalize() for user in api_service.get_players_from_db()
-    ]:
-        raise NameAlreadyExistsError("A player with this name already exists !")
-
     player = Player(name=name)
-    api_service.store_player_in_db(player)
-    return player
+    return api_service.post_players(player)
+    
 
 def delete_player(player_name: str):
-    try:
-        api_service.delete_player_from_db(player_name)
-    except PlayernotFoundError as err:
-        raise err
+    return api_service.delete_player(player_name)
 
 
 def get_all_players() -> Optional[List[Player]]:
