@@ -5,10 +5,11 @@ import uuid
 
 
 class Game(BaseModel):
-    game_id : int
+    game_id : Optional[int] = None
     is_active: bool = False
-    players: List["Player"] = []
-    turn : Optional[str] = ""
+    white_player : Optional["Player"] = None
+    black_player : Optional["Player"] = None
+    turn : Optional[str] = None
     fen: Optional[str] = None
 
     # @field_validator('players')
@@ -25,7 +26,7 @@ class Player(BaseModel):
     """Player model"""
 
     name: str
-    player_id : int
+    player_id : Optional[int] = None
     rank: Optional[int] = None
     friends: List["Player"] = []
     active_games: List[int] = []
