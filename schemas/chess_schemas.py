@@ -5,7 +5,7 @@ import uuid
 
 
 class Game(BaseModel):
-    game_uuid: uuid.UUID = Field(default_factory=uuid.uuid4)
+    game_id : int
     is_active: bool = False
     players: List["Player"] = []
     turn : Optional[str] = ""
@@ -25,11 +25,11 @@ class Player(BaseModel):
     """Player model"""
 
     name: str
-    player_uuid: uuid.UUID = Field(default_factory=uuid.uuid4)
+    player_id : int
     rank: Optional[int] = None
     friends: List["Player"] = []
-    active_games: List[uuid.UUID] = []
-    color: Optional[str] = None
+    active_games: List[int] = []
+    
 
 
 Game.model_rebuild()
