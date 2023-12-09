@@ -1,5 +1,5 @@
 {
-  "name": "my-project",
+  "name": "strapi-chess-db",
   "private": true,
   "version": "0.1.0",
   "description": "A Strapi application",
@@ -9,12 +9,12 @@
     "build": "strapi build",
     "strapi": "strapi"
   },
+  "devDependencies": {},
   "dependencies": {
-    "@strapi/plugin-cloud": "4.15.4",
-    "@strapi/plugin-documentation": "^4.15.4",
-    "@strapi/plugin-i18n": "4.15.4",
-    "@strapi/plugin-users-permissions": "4.15.4",
-    "@strapi/strapi": "4.15.4",
+    "@strapi/strapi": "4.15.5",
+    "@strapi/plugin-users-permissions": "4.15.5",
+    "@strapi/plugin-i18n": "4.15.5",
+    "@strapi/plugin-cloud": "4.15.5",
     "better-sqlite3": "8.6.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
@@ -25,7 +25,7 @@
     "name": "A Strapi developer"
   },
   "strapi": {
-    "uuid": "acccd0dd-34e3-40fa-8e88-5abf9f31268a"
+    "uuid": "35af674b-39b4-4ccc-b445-d259b5ae4ee4"
   },
   "engines": {
     "node": ">=18.0.0 <=20.x.x",
