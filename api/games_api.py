@@ -3,6 +3,7 @@ from custom_errors.custom_errors import (
     GameIsFullError,
     GameNotFoundError,
     PlayerAlreadyInGameError,
+    PlayernotFoundError,
 )
 from database_services.strapi_api_service import StrapiApiService
 
@@ -37,8 +38,12 @@ def join_game(game_id: int, player_name: str):
     """
     try:
         return service.add_player_to_game(player_name, game_id)
+    except GameNotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
     except GameIsFullError as err:
         raise HTTPException(status_code=403, detail=str(err))
+    except PlayernotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
     except PlayerAlreadyInGameError as err:
         raise HTTPException(status_code=403, detail=str(err))
 
