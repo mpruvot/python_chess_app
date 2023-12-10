@@ -213,7 +213,7 @@ class StrapiApiService:
         updated_game_data = response.json()["data"]
         return self._convert_json_to_game_object(updated_game_data)
 
-    def add_player_to_game(self, player: Player, game: Game) -> Game:
+    def add_player_to_game(self, player_name: str, game_id: int) -> Game:
         """
         Add a player to a game in the database.
 
@@ -228,7 +228,10 @@ class StrapiApiService:
             GameIsFullError: If the game cannot accommodate more players.
             requests.exceptions.HTTPError: If an HTTP error occurs during the API request.
         """
-        # Check if the game can accommodate more players
+        player = self.get_single_player(player_name)
+        game = self.get_single_game(game_id)
+        
+        # Check if the game can has more players
         if self._check_full_game(game):
             raise GameIsFullError(f"Game with ID {game.game_id} is already full.")
 
