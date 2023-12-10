@@ -191,7 +191,7 @@ class StrapiApiService:
         response.raise_for_status()
         updated_player_data = response.json()["data"]
         return self._convert_json_to_player_object(updated_player_data)
-    
+
     def update_game(self, game: Game) -> Game:
         """Function that makes the update call
 
@@ -212,46 +212,6 @@ class StrapiApiService:
         response.raise_for_status()
         updated_game_data = response.json()["data"]
         return self._convert_json_to_game_object(updated_game_data)
-    
-    def _add_game_to_player_active_games(self, player: Player, game: Game) -> Player:
-        """
-        Add a game to a player's list of active games in the database.
-
-        Args:
-            player (Player): The player to update.
-            game_id (int): The ID of the game to add to the player's active games list.
-
-        Returns:
-            Player: The updated player object with the modified active games list.
-
-        Raises:
-            PlayerAlreadyInGameError: If the player is already in the specified game.
-            requests.exceptions.HTTPError: If an HTTP error occurs during the API request.
-        """
-        if game.game_id in player.active_games:
-            raise PlayerAlreadyInGameError(
-                f"Player {player.name} already in game with ID: {game.game_id}"
-            )
-
-        player.active_games.append(game.game_id)
-
-        player_data_json = json.loads(player.model_dump_json())
-        payload = json.dumps({"data": player_data_json})
-
-        response = requests.put(
-            f"{self.API_URL}/players/{player.player_id}",
-            headers={"Content-Type": "application/json"},
-            data=payload,
-        )
-        response.raise_for_status()
-        updated_player_data = response.json()["data"]
-        return self._convert_json_to_player_object(updated_player_data)
-
-    def _delete_game_from_player_active_games(self, player: Player, game: Game) -> Player:
-        if game.game_id in player.active_games:
-            player.active_games.remove(game.game_id)
-            return player
-        return None
 
     def add_player_to_game(self, player: Player, game: Game) -> Game:
         """
@@ -282,20 +242,38 @@ class StrapiApiService:
 
         self._add_game_to_player_active_games(player, game)
 
-        game_data_json = json.loads(game.model_dump_json())
-        payload = json.dumps({"data": game_data_json})
+        return self.update_game(game=game)
 
-        response = requests.put(
-            f"{self.API_URL}/games/{game.game_id}",
-            headers={"Content-Type": "application/json"},
-            data=payload,
-        )
-        response.raise_for_status()
-        updated_game_data = response.json()["data"]
-        return self._convert_json_to_game_object(updated_game_data)
 
-    def update_fen_of_game(self, game: Game, fen: str) -> Game:
-        pass
+    def _add_game_to_player_active_games(self, player: Player, game: Game) -> Player:
+        """
+        Add a game to a player's list of active games in the database.
+
+        Args:
+            player (Player): The player to update.
+            game_id (int): The ID of the game to add to the player's active games list.
+
+        Returns:
+            Player: The updated player object with the modified active games list.
+
+        Raises:
+            PlayerAlreadyInGameError: If the player is already in the specified game.
+            requests.exceptions.HTTPError: If an HTTP error occurs during the API request.
+        """
+        if game.game_id in player.active_games:
+            raise PlayerAlreadyInGameError(
+                f"Player {player.name} already in game with ID: {game.game_id}"
+            )
+        player.active_games.append(game.game_id)
+        return self.update_player(player=player)
+
+    def _delete_game_from_player_active_games(
+        self, player: Player, game_id: int
+    ) -> Player:
+        if game_id in player.active_games:
+            player.active_games.remove(game_id)
+            return self.update_player(player)
+        return None
 
     ## Delete Methods
 
@@ -332,9 +310,18 @@ class StrapiApiService:
             requests.exceptions.HTTPError: If an HTTP error occurs during the API request.
         """
         try:
+            game = self.get_single_game(game_id)
+
+            for player in [game.white_player, game.black_player]:
+                if player:
+                    self._delete_game_from_player_active_games(player, game_id)
+
             response = requests.delete(f"{self.API_URL}/games/{game_id}")
+
             if response.status_code == 404:
                 raise GameNotFoundError(f"No game with ID {game_id} found")
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             raise err
+
+
