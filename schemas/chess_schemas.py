@@ -1,36 +1,26 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
-from typing_extensions import Annotated
 from custom_errors.custom_errors import *
 import uuid
 
 
 class Game(BaseModel):
-    game_uuid: uuid.UUID = Field(default_factory=uuid.uuid4)
+    game_id: Optional[int] = None
     is_active: bool = False
-    players: List["Player"] = []
-    turn : Optional[str] = ""
+    white_player: Optional["Player"] = None
+    black_player: Optional["Player"] = None
+    turn: Optional[str] = None
     fen: Optional[str] = None
-
-    # @field_validator('players')
-    # @classmethod
-    # def check_number_of_players(cls, v: list):
-    #   if len(v) >= 2:
-    #      raise GameIsFullError('Already two players in the game !')
-    # return v
-
-    # State -> probably need to load it from a database
 
 
 class Player(BaseModel):
     """Player model"""
 
     name: str
-    player_uuid: uuid.UUID = Field(default_factory=uuid.uuid4)
+    player_id: Optional[int] = None
     rank: Optional[int] = None
     friends: List["Player"] = []
-    active_games: List[Game] = []
-    color: Optional[str] = None
+    active_games: List[int] = []
 
 
 Game.model_rebuild()

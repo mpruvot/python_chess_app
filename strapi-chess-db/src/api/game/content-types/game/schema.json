@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "games",
+  "info": {
+    "singularName": "game",
+    "pluralName": "games",
+    "displayName": "Game"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "is_active": {
+      "type": "boolean"
+    },
+    "fen": {
+      "type": "string"
+    },
+    "white_player": {
+      "type": "json"
+    },
+    "black_player": {
+      "type": "json"
+    },
+    "turn": {
+      "type": "string"
+    }
+  }
+}
