@@ -7,10 +7,8 @@ from custom_errors.custom_errors import (
     InvalidTurnError,
     NotActiveGameError,
 )
-
-from chess_services.chess_engine_services import make_a_move, start_new_game
-from schemas.chess_schemas import Game
-
+from schemas.game import Game
+from services.chess_engine_service import make_a_move, start_new_game
 
 router = APIRouter()
 

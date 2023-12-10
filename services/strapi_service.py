@@ -8,7 +8,8 @@ from custom_errors.custom_errors import (
     PlayerAlreadyInGameError,
     PlayernotFoundError,
 )
-from schemas.chess_schemas import Game, Player
+from schemas.game import Game
+from schemas.player import Player
 
 
 class StrapiApiService:
