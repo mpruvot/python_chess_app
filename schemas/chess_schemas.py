@@ -1,20 +1,20 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel
 from typing import Optional, List
 from custom_errors.custom_errors import *
-import uuid
 
 
 class Game(BaseModel):
+    """Chess Model"""
     game_id: Optional[int] = None
     is_active: bool = False
     white_player: Optional["Player"] = None
     black_player: Optional["Player"] = None
     turn: Optional[str] = None
-    fen: Optional[str] = None
+    fen: str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 
 class Player(BaseModel):
-    """Player model"""
+    """Player Model"""
 
     name: str
     player_id: Optional[int] = None
