@@ -5,9 +5,8 @@ from custom_errors.custom_errors import (
     PlayerAlreadyInGameError,
     PlayernotFoundError,
 )
-from database_services.strapi_api_service import StrapiApiService
-
-from schemas.chess_schemas import Game
+from schemas.game import Game
+from services.strapi_service import StrapiApiService
 
 
 router = APIRouter()

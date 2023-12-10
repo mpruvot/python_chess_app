@@ -1,8 +1,8 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from custom_errors.custom_errors import NameAlreadyExistsError, PlayernotFoundError
-from database_services.strapi_api_service import StrapiApiService
-from schemas.chess_schemas import Player
+from services.strapi_service import StrapiApiService
+from schemas.player import Player
 
 
 router = APIRouter()

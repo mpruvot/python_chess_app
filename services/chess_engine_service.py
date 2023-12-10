@@ -4,8 +4,7 @@ from custom_errors.custom_errors import (
     GameNotFoundError,
     NotActiveGameError,
 )
-from database_services.strapi_api_service import StrapiApiService
-
+from services.strapi_service import StrapiApiService
 
 api_service = StrapiApiService()
 
