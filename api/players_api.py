@@ -1,17 +1,13 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from custom_errors.custom_errors import NameAlreadyExistsError, PlayernotFoundError
-
+from database_services.strapi_api_service import StrapiApiService
 from schemas.chess_schemas import Player
-from management_services.player_services import (
-    create_player,
-    delete_player,
-    get_all_players,
-    get_single_player,
-)
 
 
 router = APIRouter()
+
+service = StrapiApiService()
 
 
 @router.get("/")
@@ -19,7 +15,7 @@ def home_page():
     return {"message": "Chess API"}
 
 
-@router.post("/player/", response_model=Player)
+@router.post("/players/{name}", response_model=Player)
 def new_player(name: str) -> Player:
     """
     Endpoint to create a new player.
@@ -31,13 +27,13 @@ def new_player(name: str) -> Player:
         HTTPException: If a player with the same name already exists.
     """
     try:
-        return create_player(name=name)
+        return service.post_players(Player(name=name))
     except NameAlreadyExistsError as err:
         raise HTTPException(status_code=403, detail=str(err))
 
 
 @router.get("/players/", response_model=List[Player])
-def get_players() -> List[Player]:
+def list_players() -> List[Player]:
     """
     Endpoint to retrieve a list of all players.
     Returns:
@@ -46,13 +42,13 @@ def get_players() -> List[Player]:
         HTTPException: If no players are found.
     """
     try:
-        return get_all_players()
+        return service.get_players()
     except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
 
-@router.get("/player/{name}", response_model=Player)
-def return_player_by_name(name: str) -> Player:
+@router.get("/players/{name}", response_model=Player)
+def retrieve_player(name: str) -> Player:
     """
     Endpoint to retrieve a single player by name.
     Args:
@@ -63,14 +59,14 @@ def return_player_by_name(name: str) -> Player:
         HTTPException: If no player with the specified name is found.
     """
     try:
-        return get_single_player(name)
+        return service.get_single_player(name=name)
     except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
 
-@router.delete("/player/{name}")
-def delete_player_by_name(name: str):
+@router.delete("/players/{name}")
+def delete_player(name: str):
     try:
-        return delete_player(name)
+        return service.delete_player(name=name)
     except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
