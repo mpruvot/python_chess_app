@@ -34,11 +34,11 @@ class StrapiApiService:
         game = Game(**game_attributes)
         game.game_id = game_id
         return game
-    
+
     @staticmethod
     def _check_full_game(game: Game) -> bool:
-         return game.white_player is not None and game.black_player is not None
-     
+        return game.white_player is not None and game.black_player is not None
+
     ## Get Methods
 
     def get_players(self) -> List[Player]:
@@ -171,6 +171,48 @@ class StrapiApiService:
 
     ## Put Methods
 
+    def update_player(self, player: Player) -> Player:
+        """Function that makes the update call
+
+        Args:
+            player (Player): Player Object
+
+        Returns:
+            Player: updated Player
+        """
+        player_data_json = json.loads(player.model_dump_json())
+        payload = json.dumps({"data": player_data_json})
+
+        response = requests.put(
+            f"{self.API_URL}/players/{player.player_id}",
+            headers={"Content-Type": "application/json"},
+            data=payload,
+        )
+        response.raise_for_status()
+        updated_player_data = response.json()["data"]
+        return self._convert_json_to_player_object(updated_player_data)
+    
+    def update_game(self, game: Game) -> Game:
+        """Function that makes the update call
+
+        Args:
+            game (game): game Object
+
+        Returns:
+            game: updated game
+        """
+        game_data_json = json.loads(game.model_dump_json())
+        payload = json.dumps({"data": game_data_json})
+
+        response = requests.put(
+            f"{self.API_URL}/games/{game.game_id}",
+            headers={"Content-Type": "application/json"},
+            data=payload,
+        )
+        response.raise_for_status()
+        updated_game_data = response.json()["data"]
+        return self._convert_json_to_game_object(updated_game_data)
+    
     def _add_game_to_player_active_games(self, player: Player, game: Game) -> Player:
         """
         Add a game to a player's list of active games in the database.
@@ -205,6 +247,12 @@ class StrapiApiService:
         updated_player_data = response.json()["data"]
         return self._convert_json_to_player_object(updated_player_data)
 
+    def _delete_game_from_player_active_games(self, player: Player, game: Game) -> Player:
+        if game.game_id in player.active_games:
+            player.active_games.remove(game.game_id)
+            return player
+        return None
+
     def add_player_to_game(self, player: Player, game: Game) -> Game:
         """
         Add a player to a game in the database.
@@ -228,12 +276,11 @@ class StrapiApiService:
             game.white_player = player
         elif not game.black_player:
             game.black_player = player
-        
+
         if self._check_full_game(game):
             game.is_active = True
-        
+
         self._add_game_to_player_active_games(player, game)
-        
 
         game_data_json = json.loads(game.model_dump_json())
         payload = json.dumps({"data": game_data_json})
