@@ -694,6 +694,8 @@ export interface ApiGameGame extends Schema.CollectionType {
     black_player: Attribute.JSON;
     fen: Attribute.String;
     turn: Attribute.JSON;
+    game_over: Attribute.Boolean;
+    winner: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

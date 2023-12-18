@@ -26,6 +26,12 @@
     },
     "turn": {
       "type": "json"
+    },
+    "game_over": {
+      "type": "boolean"
+    },
+    "winner": {
+      "type": "json"
     }
   }
 }

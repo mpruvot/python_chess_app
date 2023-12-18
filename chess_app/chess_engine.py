@@ -124,6 +124,8 @@ class ChessGame:
         Returns:
             bool: True if the game is over, False otherwise.
         """
+        if self.board.is_game_over():
+            self.game.is_active = False
         return self.board.is_game_over()
 
     def get_board(self):
@@ -148,21 +150,6 @@ class ChessGame:
         moves = list(self.board.legal_moves)
         moves_uci = [move.uci() for move in moves]
         return moves_uci
-
-    def end_of_game(self):
-        """
-        Determine the end status of the game.
-
-        Returns:
-            str: The end status of the game (e.g., "Checkmate", "Stalemate", "Draw").
-        """
-        if self.board.is_checkmate():
-            return "Checkmate"
-        elif self.board.is_stalemate():
-            return "Stalemate"
-        elif self.board.is_insufficient_material():
-            return "Draw due to insufficient material"
-        return "Draw"
 
     def determine_winner(self):
         """
