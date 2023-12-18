@@ -683,16 +683,17 @@ export interface ApiGameGame extends Schema.CollectionType {
     singularName: 'game';
     pluralName: 'games';
     displayName: 'Game';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
     is_active: Attribute.Boolean;
-    fen: Attribute.String;
     white_player: Attribute.JSON;
     black_player: Attribute.JSON;
-    turn: Attribute.String;
+    fen: Attribute.String;
+    turn: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -708,7 +709,8 @@ export interface ApiPlayerPlayer extends Schema.CollectionType {
   info: {
     singularName: 'player';
     pluralName: 'players';
-    displayName: 'Player';
+    displayName: 'player';
+    description: '';
   };
   options: {
     draftAndPublish: true;

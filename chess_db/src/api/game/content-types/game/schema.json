@@ -4,7 +4,8 @@
   "info": {
     "singularName": "game",
     "pluralName": "games",
-    "displayName": "Game"
+    "displayName": "Game",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -14,17 +15,17 @@
     "is_active": {
       "type": "boolean"
     },
-    "fen": {
-      "type": "string"
-    },
     "white_player": {
       "type": "json"
     },
     "black_player": {
       "type": "json"
     },
-    "turn": {
+    "fen": {
       "type": "string"
+    },
+    "turn": {
+      "type": "json"
     }
   }
 }
