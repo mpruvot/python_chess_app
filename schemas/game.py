@@ -1,3 +1,4 @@
+from tkinter import N
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -11,8 +12,10 @@ class Game(BaseModel):
     is_active: bool = False
     white_player: Optional[Player] = None
     black_player: Optional[Player] = None
-    turn: Optional[str] = None
+    turn: Optional[Player] = None
     fen: str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    game_over: bool = False
+    winner: Optional[Player] = None
 
 
 Game.model_rebuild()

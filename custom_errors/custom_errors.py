@@ -47,5 +47,10 @@ class GameOverError(Exception):
 class GameAlreadyStartedError(Exception):
     pass
 
+class InvalidFENError(Exception):
+    pass
 
+
+class InvalidMoveError(Exception):
+    pass
 # https://www.programiz.com/python-programming/user-defined-exception

@@ -36,7 +36,7 @@ def join_game(game_id: int, player_name: str):
         HTTPException: If the game is full or if the game is not found.
     """
     try:
-        return service.add_player_to_game(player_name, game_id)
+        return service.add_player_to_game(player_name.capitalize(), game_id)
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
     except GameIsFullError as err:
