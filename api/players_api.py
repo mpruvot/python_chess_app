@@ -27,7 +27,7 @@ def new_player(name: str) -> Player:
         HTTPException: If a player with the same name already exists.
     """
     try:
-        return service.post_players(Player(name=name))
+        return service.post_players(Player(name=name.capitalize()))
     except NameAlreadyExistsError as err:
         raise HTTPException(status_code=403, detail=str(err))
 
@@ -59,7 +59,7 @@ def retrieve_player(name: str) -> Player:
         HTTPException: If no player with the specified name is found.
     """
     try:
-        return service.get_single_player(name=name)
+        return service.get_single_player(name=name.capitalize())
     except PlayernotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
