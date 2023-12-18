@@ -60,8 +60,7 @@ class ChessGame:
         self._validate_player_turn(player)
         self._execute_move(move)
         self._update_turn()
-
-        self.game.fen = self.board.fen()
+        self._update_game_state()
         self.game.game_over = self.is_game_over()
         self.game.winner = self.determine_winner() if self.game.game_over else None
 
@@ -96,8 +95,10 @@ class ChessGame:
             self.board.push_san(move)
         except chess.IllegalMoveError as err:
             raise InvalidMoveError(
-                 f"The move '{move}' is illegal in the current position: {err}"
+                f"The move '{move}' is illegal in the current position: {err}"
             )
+        except chess.InvalidMoveError as err:
+            raise InvalidMoveError(f"The move '{move}' is invalid")
 
     def _update_turn(self):
         """
@@ -108,6 +109,7 @@ class ChessGame:
             if self.current_turn == self.black_player
             else self.black_player
         )
+        self.game.turn = self.current_turn
 
     def _update_game_state(self):
         """
@@ -132,7 +134,7 @@ class ChessGame:
             str: The current board position in FEN notation.
         """
         return self.board.fen()
-    
+
     def get_player_turn(self):
         """
         Get the current player's turn.
@@ -141,7 +143,7 @@ class ChessGame:
             Player: The player whose turn it is.
         """
         return self.current_turn
-    
+
     def get_legal_move(self):
         moves = list(self.board.legal_moves)
         moves_uci = [move.uci() for move in moves]

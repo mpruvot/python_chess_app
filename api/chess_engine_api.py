@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Body
 import chess
 from pydantic import BaseModel
 from chess_app.chess_engine import ChessGame
-from custom_errors.custom_errors import GameOverError, InvalidMoveError, InvalidTurnError
+from custom_errors.custom_errors import GameNotFoundError, GameOverError, InvalidMoveError, InvalidTurnError, PlayernotFoundError
 
 from services.strapi_service import StrapiApiService
 
@@ -15,14 +15,18 @@ service = StrapiApiService()
 
 @router.patch("/games/{game_id}")
 def make_a_move(game_id: int, move_details: MoveDetails = Body(...)):
-    game = service.get_single_game(game_id=game_id)
-    player = service.get_single_player(name=move_details.player_name.capitalize())
-    chess_game = ChessGame(game=game)
+    try: 
+        game = service.get_single_game(game_id=game_id)
+        player = service.get_single_player(name=move_details.player_name.capitalize())
+        chess_game = ChessGame(game=game)
+    except PlayernotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
+    except GameNotFoundError as err:
+        raise HTTPException(status_code=404, detail=str(err))
     
     if player in [game.black_player, game.white_player]:
         try:
             updated_game = chess_game.move(move_details.move, player)
-            return updated_game
             service.update_game(updated_game) 
             return updated_game
         except InvalidMoveError as err:
