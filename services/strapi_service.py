@@ -238,7 +238,7 @@ class StrapiApiService:
 
         if not game.white_player:
             game.white_player = player
-            game.turn = player.name
+            game.turn = player
         elif not game.black_player:
             game.black_player = player
 

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 import chess
+from chess_app.chess_engine import ChessGame
 from custom_errors.custom_errors import (
     GameAlreadyStartedError,
     GameNotFoundError,
@@ -8,30 +9,30 @@ from custom_errors.custom_errors import (
     NotActiveGameError,
 )
 from schemas.game import Game
-from services.chess_engine_service import make_a_move, start_new_game
+from services.strapi_service import StrapiApiService
+
 
 router = APIRouter()
 
+service = StrapiApiService()
 
-@router.post("/game/{game_uuid}/")
-def start_game(game_uuid: str):
-    try:
-        return start_new_game(game_uuid)
-    except NotActiveGameError as err:
-        raise HTTPException(status_code=403, detail=str(err))
-    except GameNotFoundError as err:
-        raise HTTPException(status_code=404, detail=str(err))
-    except GameAlreadyStartedError as err:
-        raise HTTPException(status_code=403, detail=str(err))
-
-@router.post("/game/move/{game_uuid}/{player_name}/{move}")
-def make_move(game_uuid, player_name, move) -> Game:
-    try:
-        return make_a_move(game_uuid=game_uuid, player_name=player_name, move=move)
-    except NotActiveGameError as err:
-        raise HTTPException(status_code=403, detail=str(err))
-    except GameNotFoundError as err:
-        raise HTTPException(status_code=404, detail=str(err))
-    except (chess.InvalidMoveError, chess.IllegalMoveError, InvalidTurnError, GameOverError) as err:
-        raise HTTPException(status_code=404, detail=str(err))
+@router.post("/games/{game_id}/{player_name}/{move}")
+def make_a_move(game_id: int, player_name: str, move: str):
+    game = service.get_single_game(game_id=game_id)
+    player = service.get_single_player(name=player_name)
+    chess_game = ChessGame(game=game)
+    
+    if player in [game.black_player, game.white_player]:
+        try:
+            return service.update_game(chess_game.move(move, player))
+        except chess.IllegalMoveError as err:
+            raise HTTPException(status_code=403, detail=str(err))
         
+        except chess.InvalidMoveError as err:
+            raise HTTPException(status_code=403, detail=str(err))
+        except InvalidTurnError as err:
+            raise HTTPException(status_code=403, detail=str(err))
+    
+    else: 
+        raise HTTPException(status_code=403, detail=str(f"{player_name} : does',t not belong to this game, please choose a valid player"))
+    

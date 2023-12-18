@@ -8,6 +8,7 @@ app = FastAPI()
 
 app.include_router(players_api.router)
 app.include_router(games_api.router)
+app.include_router(chess_engine_api.router)
 
 
 

@@ -1,5 +1,5 @@
 {
-  "name": "strapi-chess-db",
+  "name": "chess-db",
   "private": true,
   "version": "0.1.0",
   "description": "A Strapi application",
@@ -25,7 +25,7 @@
     "name": "A Strapi developer"
   },
   "strapi": {
-    "uuid": "35af674b-39b4-4ccc-b445-d259b5ae4ee4"
+    "uuid": "b849f4d1-85ac-4fee-9832-8a91a31e8ecb"
   },
   "engines": {
     "node": ">=18.0.0 <=20.x.x",

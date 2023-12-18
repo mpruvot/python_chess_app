@@ -4,7 +4,8 @@
   "info": {
     "singularName": "player",
     "pluralName": "players",
-    "displayName": "Player"
+    "displayName": "player",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
