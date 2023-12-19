@@ -11,6 +11,7 @@ class Player(BaseModel):
     rank: Optional[int] = None
     friends: List["Player"] = []
     active_games: List[int] = []
+    password: Optional[str] = None
 
 
 Player.model_rebuild()
