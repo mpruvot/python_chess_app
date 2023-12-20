@@ -11,6 +11,27 @@ from custom_errors.custom_errors import (
 from schemas.game import Game
 from schemas.player import Player
 
+class PlayerFactory:
+    """Converts player JSON data to a Player object."""
+    @staticmethod
+    def from_strapi_response(strapi_response: dict[str, Any]) -> Player:
+        player_attributes = strapi_response["attributes"]
+        player_id = strapi_response["id"]
+        player = Player(**player_attributes)
+        player.player_id = player_id
+        return player
+    
+class GameFactory:
+    """Converts game JSON data to a Game object."""
+    @staticmethod
+    def from_strapi_response(response_data: Dict[str, Any]) -> Game:
+        """Converts game JSON data to a Game object."""
+        game_attributes = response_data["attributes"]
+        game_id = response_data["id"]
+        game = Game(**game_attributes)
+        game.game_id = game_id
+        return game
+
 
 class StrapiApiService:
     API_URL = "http://strapi:1337/api"
@@ -19,22 +40,6 @@ class StrapiApiService:
     def __init__(self) -> None:
         """Initialize the Strapi API service."""
         pass
-
-    def _convert_json_to_player_object(self, response_data: Dict[str, Any]) -> Player:
-        """Converts player JSON data to a Player object."""
-        player_attributes = response_data["attributes"]
-        player_id = response_data["id"]
-        player = Player(**player_attributes)
-        player.player_id = player_id
-        return player
-
-    def _convert_json_to_game_object(self, response_data: Dict[str, Any]) -> Game:
-        """Converts game JSON data to a Game object."""
-        game_attributes = response_data["attributes"]
-        game_id = response_data["id"]
-        game = Game(**game_attributes)
-        game.game_id = game_id
-        return game
 
     @staticmethod
     def _check_full_game(game: Game) -> bool:
@@ -55,9 +60,8 @@ class StrapiApiService:
             players_json = response.json()["data"]
             if not players_json:
                 raise PlayernotFoundError("No players found in the database.")
-            return [
-                self._convert_json_to_player_object(player) for player in players_json
-            ]
+            return [PlayerFactory.from_strapi_response(player) for player in players_json]
+
         except requests.exceptions.HTTPError:
             raise PlayernotFoundError("No players found in the database.")
 
@@ -81,7 +85,8 @@ class StrapiApiService:
             player_json = response.json()["data"]
             if not player_json:
                 raise PlayernotFoundError("No player with this name")
-            return self._convert_json_to_player_object(player_json[0])
+            return PlayerFactory.from_strapi_response(player_json[0])
+
         except requests.exceptions.HTTPError as err:
             raise err
 
@@ -93,7 +98,7 @@ class StrapiApiService:
             games_json = response.json()["data"]
             if not games_json:
                 raise GameNotFoundError("No games found in the database.")
-            return [self._convert_json_to_game_object(game) for game in games_json]
+            return [GameFactory.from_strapi_response(game) for game in games_json]
         except requests.exceptions.HTTPError as err:
             raise err
 
@@ -118,7 +123,7 @@ class StrapiApiService:
             if err.status_code == 404:
                 raise GameNotFoundError(f"No game with ID {game_id} found")
         game_json = response.json()["data"]
-        return self._convert_json_to_game_object(game_json)
+        return GameFactory.from_strapi_response(game_json)
 
 
     ## Post Methods
@@ -147,7 +152,7 @@ class StrapiApiService:
             )
             response.raise_for_status()
             player_json = response.json()["data"]
-            return self._convert_json_to_player_object(player_json)
+            return PlayerFactory.from_strapi_response(player_json)
         except requests.exceptions.HTTPError as err:
             raise NameAlreadyExistsError(
                 f"A player with this Name already exists : {err}"
@@ -164,7 +169,7 @@ class StrapiApiService:
                 data=payload,
             )
             response.raise_for_status()
-            return self._convert_json_to_game_object(response.json()["data"])
+            return GameFactory.from_strapi_response(response.json()["data"])
         except requests.exceptions.HTTPError as err:
             raise requests.exceptions.HTTPError(
                 f"Failed to store game in database: {err}"
@@ -191,7 +196,7 @@ class StrapiApiService:
         )
         response.raise_for_status()
         updated_player_data = response.json()["data"]
-        return self._convert_json_to_player_object(updated_player_data)
+        return PlayerFactory.from_strapi_response(updated_player_data)
 
     def update_game(self, game: Game) -> Game:
         """Function that makes the update call
@@ -212,7 +217,7 @@ class StrapiApiService:
         )
         response.raise_for_status()
         updated_game_data = response.json()["data"]
-        return self._convert_json_to_game_object(updated_game_data)
+        return GameFactory.from_strapi_response(updated_game_data)
 
     def add_player_to_game(self, player_name: str, game_id: int) -> Game:
         """
