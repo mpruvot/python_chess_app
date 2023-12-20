@@ -113,13 +113,13 @@ class StrapiApiService:
         """
         try:
             response = requests.get(f"{self.API_URL}/games/{game_id}")
-            if response.status_code == 404:
-                raise GameNotFoundError(f"No game with ID {game_id} found")
             response.raise_for_status()
-            game_json = response.json()["data"]
-            return self._convert_json_to_game_object(game_json)
         except requests.exceptions.HTTPError as err:
-            raise err
+            if err.status_code == 404:
+                raise GameNotFoundError(f"No game with ID {game_id} found")
+        game_json = response.json()["data"]
+        return self._convert_json_to_game_object(game_json)
+
 
     ## Post Methods
 
