@@ -10,7 +10,7 @@ from services.strapi_service import StrapiApiService
 
 
 router = APIRouter()
-service = StrapiApiService()
+chess_api_manager = StrapiApiService()
 
 
 @router.post("/games/", response_model=Game)
@@ -20,7 +20,7 @@ def new_game():
     Returns:
         Game: The newly created game instance.
     """
-    return service.post_games(Game())
+    return chess_api_manager.post_games(Game())
 
 
 @router.patch("/games/{game_id}/{player_name}", response_model=Game)
@@ -36,7 +36,7 @@ def join_game(game_id: int, player_name: str):
         HTTPException: If the game is full or if the game is not found.
     """
     try:
-        return service.add_player_to_game(player_name.capitalize(), game_id)
+        return chess_api_manager.add_player_to_game(player_name.capitalize(), game_id)
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
     except GameIsFullError as err:
@@ -60,7 +60,7 @@ def list_games():
     """
 
     try:
-        return service.get_games()
+        return chess_api_manager.get_games()
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
@@ -77,7 +77,7 @@ def retrieve_game(game_id: int):
         HTTPException: If no game with the specified UUID is found.
     """
     try:
-        return service.get_single_game(game_id)
+        return chess_api_manager.get_single_game(game_id)
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
@@ -85,6 +85,6 @@ def retrieve_game(game_id: int):
 @router.delete("/games/{game_id}")
 def delete_game(game_id: int):
     try:
-        return service.delete_game(game_id)
+        return chess_api_manager.delete_game(game_id)
     except GameNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err))
