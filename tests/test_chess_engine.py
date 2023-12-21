@@ -1,4 +1,5 @@
 import pytest
+from custom_errors.custom_errors import InvalidTurnError
 from schemas.game import Game
 from schemas.player import Player
 from chess_app.chess_engine import ChessGame
@@ -31,3 +32,10 @@ def test_set_board(default_game):
 
     # Test after setting a new fen
     assert default_game.board.fen() == new_fen
+
+def test_validate_player_turn(default_game):
+    assert default_game._validate_player_turn(default_game.game.white_player) == True
+
+def test_validate_player_turn_exception(default_game):
+    with pytest.raises(InvalidTurnError):
+        default_game._validate_player_turn(default_game.game.black_player)

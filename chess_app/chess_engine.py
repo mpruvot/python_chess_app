@@ -67,7 +67,7 @@ class ChessGame:
 
         return self.game
 
-    def _validate_player_turn(self, player: Player) -> None:
+    def _validate_player_turn(self, player: Player) -> bool:
         """
         Validate if it's the correct player's turn.
 
@@ -81,6 +81,7 @@ class ChessGame:
             raise InvalidTurnError(
                 f"Not your turn, {self.current_turn.name} needs to play first"
             )
+        return True
 
     def _execute_move(self, move: str) -> None:
         """
