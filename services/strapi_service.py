@@ -34,7 +34,7 @@ class GameFactory:
 
 
 class StrapiApiService:
-    API_URL = "http://strapi:1337/api"
+    API_URL = "http://localhost:1337/api"
     FILTER_PLAYER_BY_NAME = "/players?filters[name][$eq]="
 
     def __init__(self) -> None:
