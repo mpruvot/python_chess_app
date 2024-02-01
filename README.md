@@ -48,7 +48,7 @@ It offers a range of endpoints for managing chess games and players, providing f
   ```python3 -m venv venv```
   
 - install all the dependancies:
-    ```pip install - r requirements.txt```
+    ```pip install -r requirements.txt```
   
 - run uvicorn, in root: ```uvicorn api.main:app --reload```
 
