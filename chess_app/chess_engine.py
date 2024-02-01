@@ -1,3 +1,4 @@
+from ast import List
 import chess
 from custom_errors.custom_errors import (
     InvalidTurnError,
@@ -23,7 +24,7 @@ class ChessGame:
         self.board = chess.Board()
         self.set_board(game.fen)
 
-    def set_board(self, fen: str):
+    def set_board(self, fen: str) -> None:
         """
         Set the game board to a given FEN.
 
@@ -38,7 +39,7 @@ class ChessGame:
         except ValueError as err:
             raise InvalidMoveError(f"Invalid FEN: {err}")
 
-    def move(self, move: str, player: Player):
+    def move(self, move: str, player: Player) -> Game:
         """
         Make a move in the chess game.
 
@@ -66,7 +67,7 @@ class ChessGame:
 
         return self.game
 
-    def _validate_player_turn(self, player: Player):
+    def _validate_player_turn(self, player: Player) -> None:
         """
         Validate if it's the correct player's turn.
 
@@ -81,7 +82,7 @@ class ChessGame:
                 f"Not your turn, {self.current_turn.name} needs to play first"
             )
 
-    def _execute_move(self, move: str):
+    def _execute_move(self, move: str) -> None:
         """
         Execute a move on the chess board.
 
@@ -100,7 +101,7 @@ class ChessGame:
         except chess.InvalidMoveError as err:
             raise InvalidMoveError(f"The move '{move}' is invalid")
 
-    def _update_turn(self):
+    def _update_turn(self) -> None:
         """
         Update the player turn after a move.
         """
@@ -111,13 +112,13 @@ class ChessGame:
         )
         self.game.turn = self.current_turn
 
-    def _update_game_state(self):
+    def _update_game_state(self) -> None:
         """
         Update the game state after a move.
         """
         self.game.fen = self.board.fen()
 
-    def is_game_over(self):
+    def is_game_over(self) -> bool:
         """
         Check if the game is over.
 
@@ -128,7 +129,7 @@ class ChessGame:
             self.game.is_active = False
         return self.board.is_game_over()
 
-    def get_board(self):
+    def get_board_fen(self) -> str:
         """
         Get the current board position in FEN.
 
@@ -137,7 +138,7 @@ class ChessGame:
         """
         return self.board.fen()
 
-    def get_player_turn(self):
+    def get_player_turn(self) -> Player:
         """
         Get the current player's turn.
 
@@ -146,12 +147,12 @@ class ChessGame:
         """
         return self.current_turn
 
-    def get_legal_move(self):
+    def get_legal_move(self) -> list:
         moves = list(self.board.legal_moves)
         moves_uci = [move.uci() for move in moves]
         return moves_uci
 
-    def determine_winner(self):
+    def determine_winner(self) -> [Player, str, None]:
         """
         Determine the winner of the game.
 

@@ -3,12 +3,9 @@ import chess
 from pydantic import BaseModel
 from chess_app.chess_engine import ChessGame
 from custom_errors.custom_errors import GameNotFoundError, GameOverError, InvalidMoveError, InvalidTurnError, PlayernotFoundError
+from schemas.move_details import MoveDetails
 
 from services.strapi_service import StrapiApiService
-
-class MoveDetails(BaseModel):
-    player_name: str
-    move: str
 
 router = APIRouter()
 service = StrapiApiService()
