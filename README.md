@@ -43,8 +43,21 @@ It offers a range of endpoints for managing chess games and players, providing f
 ---
 
 # Installation
-- create a virtual env
+### Fast api Project
+- create a virtual env:
   ```python3 -m venv venv```
+  
+- install all the dependancies:
+    ```pip install - r requirements.txt```
+  
+- run uvicorn, in root: ```uvicorn api.main:app --reload```
+
+### Strapi
+- ```cd chess_db```
+- ```npm install```
+- ```npm run develop```
+
+- in .env.exemple, replace the keys with your own and rename to .env
   
 
 
