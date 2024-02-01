@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+
 from custom_errors.custom_errors import (
     GameIsFullError,
     GameNotFoundError,
@@ -7,7 +8,6 @@ from custom_errors.custom_errors import (
 )
 from schemas.game import Game
 from services.strapi_service import StrapiApiService
-
 
 router = APIRouter()
 chess_api_manager = StrapiApiService()

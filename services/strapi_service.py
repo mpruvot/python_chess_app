@@ -1,6 +1,8 @@
 import json
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 import requests
+
 from custom_errors.custom_errors import (
     GameIsFullError,
     GameNotFoundError,
@@ -11,8 +13,10 @@ from custom_errors.custom_errors import (
 from schemas.game import Game
 from schemas.player import Player
 
+
 class PlayerFactory:
     """Converts player JSON data to a Player object."""
+
     @staticmethod
     def from_strapi_response(strapi_response: dict[str, Any]) -> Player:
         player_attributes = strapi_response["attributes"]
@@ -20,9 +24,11 @@ class PlayerFactory:
         player = Player(**player_attributes)
         player.player_id = player_id
         return player
-    
+
+
 class GameFactory:
     """Converts game JSON data to a Game object."""
+
     @staticmethod
     def from_strapi_response(response_data: Dict[str, Any]) -> Game:
         """Converts game JSON data to a Game object."""
@@ -60,7 +66,9 @@ class StrapiApiService:
             players_json = response.json()["data"]
             if not players_json:
                 raise PlayernotFoundError("No players found in the database.")
-            return [PlayerFactory.from_strapi_response(player) for player in players_json]
+            return [
+                PlayerFactory.from_strapi_response(player) for player in players_json
+            ]
 
         except requests.exceptions.HTTPError:
             raise PlayernotFoundError("No players found in the database.")
@@ -124,7 +132,6 @@ class StrapiApiService:
                 raise GameNotFoundError(f"No game with ID {game_id} found")
         game_json = response.json()["data"]
         return GameFactory.from_strapi_response(game_json)
-
 
     ## Post Methods
 
@@ -236,7 +243,7 @@ class StrapiApiService:
         """
         player = self.get_single_player(player_name)
         game = self.get_single_game(game_id)
-        
+
         # Check if the game can has more players
         if self._check_full_game(game):
             raise GameIsFullError(f"Game with ID {game.game_id} is already full.")
@@ -253,7 +260,6 @@ class StrapiApiService:
         self._add_game_to_player_active_games(player, game)
 
         return self.update_game(game=game)
-
 
     def _add_game_to_player_active_games(self, player: Player, game: Game) -> Player:
         """
@@ -333,5 +339,3 @@ class StrapiApiService:
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             raise err
-
-

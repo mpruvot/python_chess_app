@@ -1,9 +1,10 @@
 from typing import List
-from fastapi import APIRouter, HTTPException
-from custom_errors.custom_errors import NameAlreadyExistsError, PlayernotFoundError
-from services.strapi_service import StrapiApiService
-from schemas.player import Player
 
+from fastapi import APIRouter, HTTPException
+
+from custom_errors.custom_errors import NameAlreadyExistsError, PlayernotFoundError
+from schemas.player import Player
+from services.strapi_service import StrapiApiService
 
 router = APIRouter()
 

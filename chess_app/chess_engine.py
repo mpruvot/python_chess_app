@@ -1,9 +1,9 @@
-from ast import List
 import chess
+
 from custom_errors.custom_errors import (
-    InvalidTurnError,
-    InvalidMoveError,
     GameOverError,
+    InvalidMoveError,
+    InvalidTurnError,
 )
 from schemas.game import Game
 from schemas.player import Player

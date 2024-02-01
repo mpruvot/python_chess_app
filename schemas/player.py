@@ -1,6 +1,6 @@
-from pydantic import BaseModel
-from typing import Optional, List
+from typing import List, Optional
 
+from pydantic import BaseModel
 
 
 class Player(BaseModel):
