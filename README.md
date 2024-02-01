@@ -35,12 +35,16 @@ It offers a range of endpoints for managing chess games and players, providing f
 ## Testing
 - Unit tests for game and player APIs are available in `tests/test_game_api.py` and `tests/test_players_api.py`.
 
-## Deployment
-- The application can be deployed using Docker, as defined in `docker-compose.yml`.
-- To deploy, ensure Docker is installed and run `docker-compose up` in the root directory of the project.
+
 
 ## Dependencies
 - The application's dependencies are listed in `requirements.txt`. Install them using `pip install -r requirements.txt`.
 
 ---
+
+# Installation
+- create a virtual env
+  ```python3 -m venv venv```
+  
+
 
